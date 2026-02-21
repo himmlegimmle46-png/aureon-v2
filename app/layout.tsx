@@ -1,35 +1,39 @@
 import "./globals.css";
 import { Navbar } from "../components/navbar";
+import { IntroOverlay } from "../components/intro-overlay";
 import { RouteTransition } from "../components/route-transition";
-
-export const metadata = {
-  title: "Aureon V2",
-  description: "Aureon V2 storefront",
-};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
+      <body className="min-h-screen bg-black text-white">
         <div aria-hidden className="ac-bg">
-  <div className="ac-grid" />
-  <div className="ac-stars" />
-  <div className="ac-stars2" />
-  <div className="ac-aurora" />
-  <div className="ac-grain" />
-  <div className="ac-vignette" />
-</div>
-        <Navbar />
+          <div className="ac-nebula" />
+          <div className="ac-stars" />
+          <div className="ac-stars2" />
+          <div className="ac-stars3" />
+          <div className="ac-aurora" />
+          <div className="ac-grain" />
+          <div className="ac-vignette" />
+        </div>
 
-        <main className="flex-1 w-full px-4 pt-16 sm:pt-20 pb-20">
-  <div className="mx-auto w-full max-w-6xl">
-    {children}
-  </div>
-</main>
+        <IntroOverlay />
 
-        <footer className="container pb-10 pt-4 text-xs text-white/50">
-          © {new Date().getFullYear()} Aureon V2
-        </footer>
+        <div className="min-h-screen flex flex-col">
+          <Navbar />
+
+          <main className="flex-1 w-full px-4 pt-16 sm:pt-20 pb-20">
+            <div className="mx-auto w-full max-w-6xl">
+              <RouteTransition>{children}</RouteTransition>
+            </div>
+          </main>
+
+          <footer className="px-4 pb-8">
+            <div className="mx-auto w-full max-w-6xl text-xs text-white/35">
+              © {new Date().getFullYear()} Aureon V2
+            </div>
+          </footer>
+        </div>
       </body>
     </html>
   );

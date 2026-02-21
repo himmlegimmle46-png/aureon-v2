@@ -10,78 +10,97 @@ body {
 }
 
 body {
-  @apply bg-black text-white;
+  background: #000;
+  color: #fff;
 }
 
-/* ===== Animated Background (Premium) ===== */
+/* ================================
+   AUREON V2 — Galaxy Background
+================================ */
+
 .ac-bg {
   position: fixed;
   inset: 0;
   z-index: -1;
   overflow: hidden;
-  background: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.04), transparent 55%),
-    radial-gradient(ellipse at bottom, rgba(255, 255, 255, 0.02), transparent 55%),
+  background:
+    radial-gradient(1200px 900px at 15% 10%, rgba(120, 170, 255, 0.16), transparent 55%),
+    radial-gradient(900px 700px at 80% 25%, rgba(170, 110, 255, 0.12), transparent 55%),
+    radial-gradient(900px 800px at 45% 85%, rgba(90, 240, 255, 0.08), transparent 60%),
+    radial-gradient(900px 700px at 70% 85%, rgba(255, 255, 255, 0.03), transparent 60%),
     #000;
 }
 
-/* Smooth moving grid */
-.ac-grid {
+/* Soft nebula haze */
+.ac-nebula {
   position: absolute;
-  inset: -60%;
-  opacity: 0.18;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.065) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.065) 1px, transparent 1px);
-  background-size: 64px 64px;
-  transform: rotate(12deg);
-  animation: grid-drift 22s linear infinite;
+  inset: -40%;
+  background:
+    radial-gradient(45% 35% at 30% 45%, rgba(110, 170, 255, 0.18), transparent 62%),
+    radial-gradient(40% 30% at 70% 60%, rgba(170, 120, 255, 0.15), transparent 62%),
+    radial-gradient(35% 25% at 55% 35%, rgba(80, 240, 255, 0.10), transparent 62%);
+  filter: blur(34px);
+  opacity: 0.85;
+  animation: nebula-drift 18s ease-in-out infinite alternate;
   will-change: transform;
 }
 
-@keyframes grid-drift {
-  0%   { transform: rotate(12deg) translate3d(0, 0, 0); }
-  100% { transform: rotate(12deg) translate3d(140px, 90px, 0); }
+@keyframes nebula-drift {
+  0%   { transform: translate3d(-30px, 18px, 0) scale(1.02); }
+  100% { transform: translate3d(55px, -26px, 0) scale(1.08); }
 }
 
-/* Twinkling starfield (two layers) */
+/* Starfield layers */
 .ac-stars,
-.ac-stars2 {
+.ac-stars2,
+.ac-stars3 {
   position: absolute;
-  inset: -20%;
+  inset: -25%;
   background-repeat: repeat;
   will-change: transform, opacity;
+  pointer-events: none;
 }
 
 .ac-stars {
-  opacity: 0.26;
+  opacity: 0.28;
   background-size: 520px 520px;
   background-image:
-    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.9) 50%, transparent 55%),
-    radial-gradient(1px 1px at 30% 80%, rgba(255,255,255,0.7) 50%, transparent 55%),
-    radial-gradient(1px 1px at 55% 40%, rgba(255,255,255,0.75) 50%, transparent 55%),
-    radial-gradient(1px 1px at 70% 15%, rgba(255,255,255,0.6) 50%, transparent 55%),
-    radial-gradient(1px 1px at 85% 65%, rgba(255,255,255,0.8) 50%, transparent 55%),
-    radial-gradient(1px 1px at 15% 55%, rgba(255,255,255,0.6) 50%, transparent 55%),
-    radial-gradient(1px 1px at 45% 10%, rgba(255,255,255,0.7) 50%, transparent 55%),
-    radial-gradient(1px 1px at 95% 35%, rgba(255,255,255,0.8) 50%, transparent 55%);
-  animation: stars-float 70s linear infinite, stars-twinkle 6s ease-in-out infinite;
+    radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,0.95) 55%, transparent 60%),
+    radial-gradient(1px 1px at 28% 76%, rgba(255,255,255,0.80) 55%, transparent 60%),
+    radial-gradient(1px 1px at 52% 42%, rgba(255,255,255,0.85) 55%, transparent 60%),
+    radial-gradient(1px 1px at 70% 16%, rgba(255,255,255,0.70) 55%, transparent 60%),
+    radial-gradient(1px 1px at 86% 64%, rgba(255,255,255,0.88) 55%, transparent 60%),
+    radial-gradient(1px 1px at 16% 54%, rgba(255,255,255,0.70) 55%, transparent 60%),
+    radial-gradient(1px 1px at 44% 10%, rgba(255,255,255,0.75) 55%, transparent 60%),
+    radial-gradient(1px 1px at 94% 36%, rgba(255,255,255,0.85) 55%, transparent 60%);
+  animation: stars-float 75s linear infinite, stars-twinkle 6s ease-in-out infinite;
 }
 
 .ac-stars2 {
-  opacity: 0.14;
+  opacity: 0.16;
   background-size: 820px 820px;
   background-image:
-    radial-gradient(1px 1px at 12% 28%, rgba(255,255,255,0.7) 50%, transparent 55%),
-    radial-gradient(1px 1px at 26% 66%, rgba(255,255,255,0.6) 50%, transparent 55%),
-    radial-gradient(1px 1px at 62% 46%, rgba(255,255,255,0.55) 50%, transparent 55%),
-    radial-gradient(1px 1px at 78% 22%, rgba(255,255,255,0.55) 50%, transparent 55%),
-    radial-gradient(1px 1px at 90% 72%, rgba(255,255,255,0.6) 50%, transparent 55%);
-  animation: stars-float2 105s linear infinite, stars-twinkle 8s ease-in-out infinite;
+    radial-gradient(1px 1px at 18% 22%, rgba(255,255,255,0.70) 55%, transparent 60%),
+    radial-gradient(1px 1px at 32% 68%, rgba(255,255,255,0.62) 55%, transparent 60%),
+    radial-gradient(1px 1px at 62% 46%, rgba(255,255,255,0.58) 55%, transparent 60%),
+    radial-gradient(1px 1px at 78% 22%, rgba(255,255,255,0.58) 55%, transparent 60%),
+    radial-gradient(1px 1px at 90% 72%, rgba(255,255,255,0.62) 55%, transparent 60%);
+  animation: stars-float2 110s linear infinite, stars-twinkle 8s ease-in-out infinite;
+}
+
+.ac-stars3 {
+  opacity: 0.10;
+  background-size: 1100px 1100px;
+  background-image:
+    radial-gradient(1px 1px at 22% 40%, rgba(255,255,255,0.55) 55%, transparent 60%),
+    radial-gradient(1px 1px at 58% 22%, rgba(255,255,255,0.50) 55%, transparent 60%),
+    radial-gradient(1px 1px at 82% 52%, rgba(255,255,255,0.52) 55%, transparent 60%);
+  animation: stars-float3 150s linear infinite;
 }
 
 @keyframes stars-float {
   0%   { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(-180px, -110px, 0); }
+  100% { transform: translate3d(-180px, -115px, 0); }
 }
 
 @keyframes stars-float2 {
@@ -89,12 +108,17 @@ body {
   100% { transform: translate3d(140px, -90px, 0); }
 }
 
-@keyframes stars-twinkle {
-  0%, 100% { opacity: 0.22; }
-  50%      { opacity: 0.33; }
+@keyframes stars-float3 {
+  0%   { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-80px, 120px, 0); }
 }
 
-/* Aurora sweep (slow, premium) */
+@keyframes stars-twinkle {
+  0%, 100% { opacity: 0.18; }
+  50%      { opacity: 0.32; }
+}
+
+/* Aurora sweep */
 .ac-aurora {
   position: absolute;
   inset: -45%;
@@ -102,28 +126,28 @@ body {
     radial-gradient(60% 40% at 25% 45%, rgba(120, 180, 255, 0.18), transparent 58%),
     radial-gradient(50% 35% at 70% 55%, rgba(170, 120, 255, 0.14), transparent 62%),
     radial-gradient(55% 35% at 55% 30%, rgba(80, 220, 255, 0.12), transparent 64%);
-  filter: blur(28px);
-  opacity: 0.8;
-  animation: aurora-pan 18s ease-in-out infinite alternate;
+  filter: blur(30px);
+  opacity: 0.80;
+  animation: aurora-pan 16s ease-in-out infinite alternate;
   will-change: transform;
 }
 
 @keyframes aurora-pan {
-  0%   { transform: translate3d(-60px, 20px, 0) scale(1.02); }
-  100% { transform: translate3d(80px, -35px, 0) scale(1.08); }
+  0%   { transform: translate3d(-70px, 30px, 0) scale(1.02); }
+  100% { transform: translate3d(90px, -40px, 0) scale(1.10); }
 }
 
-/* Subtle film grain */
+/* Subtle film grain (optional but makes it look expensive) */
 .ac-grain {
   position: absolute;
   inset: 0;
-  pointer-events: none;
   opacity: 0.08;
+  pointer-events: none;
   background-image:
     repeating-linear-gradient(
       0deg,
-      rgba(255,255,255,0.12),
-      rgba(255,255,255,0.12) 1px,
+      rgba(255,255,255,0.10),
+      rgba(255,255,255,0.10) 1px,
       transparent 1px,
       transparent 2px
     );
@@ -140,5 +164,79 @@ body {
 .ac-vignette {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at center, transparent 35%, rgba(0, 0, 0, 0.82) 100%);
+  background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.86) 100%);
+}
+
+/* ================================
+   Intro Overlay Animation
+================================ */
+
+.ac-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(1200px 900px at 50% 40%, rgba(140, 190, 255, 0.10), transparent 55%),
+    radial-gradient(900px 700px at 65% 55%, rgba(190, 130, 255, 0.10), transparent 60%),
+    rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(10px);
+  animation: intro-fadeout 1.7s ease forwards;
+}
+
+@keyframes intro-fadeout {
+  0%   { opacity: 1; }
+  78%  { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
+
+.ac-intro-inner {
+  text-align: center;
+  transform: translate3d(0, 10px, 0);
+  opacity: 0;
+  animation: intro-in 0.65s ease forwards;
+}
+
+@keyframes intro-in {
+  0%   { opacity: 0; transform: translate3d(0, 16px, 0) scale(0.98); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+.ac-intro-title {
+  font-size: clamp(40px, 6vw, 74px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.ac-intro-glow {
+  color: rgba(255,255,255,0.95);
+  text-shadow:
+    0 0 16px rgba(120, 200, 255, 0.35),
+    0 0 34px rgba(170, 120, 255, 0.25),
+    0 0 60px rgba(80, 240, 255, 0.18);
+}
+
+.ac-intro-v2 {
+  color: rgba(255,255,255,0.55);
+  text-shadow:
+    0 0 18px rgba(255, 255, 255, 0.18);
+}
+
+.ac-intro-sub {
+  margin-top: 10px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.55);
+}
+
+/* Optional: page content “reveal” feel */
+.ac-page {
+  animation: page-in 0.55s ease both;
+  animation-delay: 0.15s;
+}
+
+@keyframes page-in {
+  0%   { opacity: 0; transform: translate3d(0, 10px, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
 }
