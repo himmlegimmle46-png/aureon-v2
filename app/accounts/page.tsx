@@ -44,13 +44,7 @@ export default function AccountsHubPage() {
           title="Rust Accounts"
           subtitle="Temporary / hours-based listings"
           meta="Steam • multiple options"
-        />
-        <CategoryCard
-          href="/accounts/bss"
-          title="Bee Swarm Accounts"
-          subtitle="Verified BSS accounts + delivery via Discord"
-          meta="Roblox • blue/red/alt listings"
-        />
+        /> 
       </div>
     </div>
   );
