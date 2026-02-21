@@ -3,32 +3,87 @@
 import { useState } from "react";
 import { Card, Button } from "../../components/ui";
 
-type Product = {
+type Variant = {
   id: string;
-  name: string;
-  priceLabel: string;
-  priceId: string;
-  description: string;
+  label: string;       // like "Rust account with 0-100 hours"
+  priceLabel: string;  // "$1.50"
+  priceId: string;     // Stripe price_...
+  inStock: boolean;
 };
 
-const PRODUCTS: Product[] = [
+type ListingGroup = {
+  id: string;
+  title: string;       // "Rust Temporary Account"
+  subtitle?: string;   // "Account For Game Accounts"
+  meta?: string;       // "Game client: Steam"
+  ratingText?: string; // "4.8 / 751+"
+  variants: Variant[];
+};
+
+const GROUPS: ListingGroup[] = [
   {
-    id: "bss-blue-hive",
-    name: "Bee Swarm Simulator account (Blue Hive)",
-    priceLabel: "$60",
-    priceId: "price_1T3GOVID1mWgKrR7wgxlK3Np",
-    description:
-      "After purchase, you’ll receive delivery instructions (Discord ticket, etc).",
+    id: "rust-temp",
+    title: "Rust Temporary Account",
+    subtitle: "Account For Game Accounts",
+    ratingText: "4.8 / 751+",
+    meta: "Game client: Steam",
+    variants: [
+      {
+        id: "0-100",
+        label: "Rust account with 0–100 hours",
+        priceLabel: "$2",
+        priceId: "price_1T3JTsID1mWgKrR7M2xp4FW6",
+        inStock: true,
+      },
+      {
+        id: "100-500",
+        label: "Rust account with 100–500 hours",
+        priceLabel: "$2.25",
+        priceId: "price_1T3Je3ID1mWgKrR7yit7LBcQ",
+        inStock: true,
+      },
+      {
+        id: "500-1000",
+        label: "Rust account with 500–1000 hours",
+        priceLabel: "$2.50",
+        priceId: "price_1T3JeYID1mWgKrR7Efip4pIQ",
+        inStock: false,
+      },
+      {
+        id: "1000-1500",
+        label: "Rust account with 1000–1500 hours",
+        priceLabel: "$2.75",
+        priceId: "price_1T3JgBID1mWgKrR7Rh5J83NR",
+        inStock: false,
+      },
+    ],
+  },
+
+  // Example: your Bee Swarm group
+  {
+    id: "bss-accounts",
+    title: "Bee Swarm Accounts",
+    subtitle: "Verified accounts + delivery via Discord ticket",
+    meta: "Platform: Roblox",
+    variants: [
+      {
+        id: "blue-hive-50",
+        label: "Blue Hive (Lvl 12) • Diamond Mask • Porcelain dipper",
+        priceLabel: "$50",
+        priceId: "price_1T3GOVID1mWgKrR7wgxlK3Np",
+        inStock: true,
+      },
+    ],
   },
 ];
 
 export default function AccountsPage() {
-  const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [loadingKey, setLoadingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  async function buy(priceId: string, productId: string) {
+  async function buy(priceId: string, key: string) {
     setError(null);
-    setLoadingId(productId);
+    setLoadingKey(key);
 
     try {
       const res = await fetch("/api/checkout", {
@@ -39,30 +94,22 @@ export default function AccountsPage() {
 
       const data = (await res.json()) as { url?: string; error?: string };
 
-      if (!res.ok || !data.url) {
-        throw new Error(data.error || "Checkout failed.");
-      }
+      if (!res.ok || !data.url) throw new Error(data.error || "Checkout failed.");
 
       window.location.href = data.url;
     } catch (e: unknown) {
-      const msg =
-        e instanceof Error ? e.message : "Checkout failed. Please try again.";
-      // Customer-friendly message
-      setError(
-        msg.includes("NEXT_PUBLIC_SITE_URL")
-          ? "Checkout is temporarily unavailable. Please try again in a moment."
-          : msg
-      );
-      setLoadingId(null);
+      const msg = e instanceof Error ? e.message : "Checkout failed. Try again.";
+      setError(msg);
+      setLoadingKey(null);
     }
   }
 
   return (
-    <div className="grid gap-5">
+    <div className="grid gap-6">
       <div>
         <h1 className="text-2xl font-semibold">Accounts</h1>
-        <p className="text-white/60 text-sm pt-1">
-          Click buy to open secure Stripe Checkout.
+        <p className="text-sm text-white/60 pt-1">
+          Choose a category, then pick an option to purchase.
         </p>
       </div>
 
@@ -72,28 +119,64 @@ export default function AccountsPage() {
         </div>
       )}
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {PRODUCTS.map((p) => (
-          <Card key={p.id} className="p-5">
-            <div className="flex items-start justify-between gap-3">
+      <div className="grid gap-4">
+        {GROUPS.map((g) => (
+          <Card key={g.id} className="p-5">
+            {/* Header */}
+            <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="grid gap-1">
-                <div className="font-medium">{p.name}</div>
-                <div className="text-sm text-white/60">{p.description}</div>
+                <div className="text-lg font-semibold">{g.title}</div>
+                {g.subtitle && <div className="text-sm text-white/60">{g.subtitle}</div>}
+                <div className="flex flex-wrap gap-3 pt-1 text-xs text-white/50">
+                  {g.ratingText && <span>Reviews: {g.ratingText}</span>}
+                  {g.meta && <span>{g.meta}</span>}
+                </div>
               </div>
-              <div className="text-sm text-white/70">{p.priceLabel}</div>
             </div>
 
-            <div className="pt-4">
-              <Button
-                onClick={() => buy(p.priceId, p.id)}
-                disabled={loadingId === p.id}
-                className="w-full"
-              >
-                {loadingId === p.id ? "Redirecting…" : "Buy"}
-              </Button>
-              <div className="pt-3 text-xs text-white/45">
-                Powered by Stripe Checkout.
-              </div>
+            {/* Variants list */}
+            <div className="mt-4 grid divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
+              {g.variants.map((v) => {
+                const key = `${g.id}:${v.id}`;
+                const disabled = !v.inStock || loadingKey === key;
+
+                return (
+                  <div
+                    key={v.id}
+                    className="flex items-center justify-between gap-4 px-4 py-3"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      {/* stock dot */}
+                      <span
+                        className={
+                          "h-2.5 w-2.5 rounded-sm " +
+                          (v.inStock ? "bg-emerald-400" : "bg-red-400")
+                        }
+                        aria-hidden
+                      />
+                      <div className="min-w-0">
+                        <div className="text-sm text-white/90 truncate">
+                          <span className="font-semibold">{v.priceLabel}</span>{" "}
+                          <span className="text-white/70">/</span>{" "}
+                          <span className="text-white/70">{v.label}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Button
+                      className="shrink-0"
+                      disabled={!v.inStock || loadingKey === key}
+                      onClick={() => buy(v.priceId, key)}
+                    >
+                      {!v.inStock ? "Sold out" : loadingKey === key ? "Loading…" : "Purchase"}
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="pt-3 text-xs text-white/45">
+              Delivery instructions are shown after checkout.
             </div>
           </Card>
         ))}
