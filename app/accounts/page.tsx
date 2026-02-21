@@ -7,7 +7,7 @@ type Product = {
   id: string;
   name: string;
   priceLabel: string;
-  priceId: string; // Stripe Price ID
+  priceId: string;
   description: string;
 };
 
@@ -18,7 +18,7 @@ const PRODUCTS: Product[] = [
     priceLabel: "$60",
     priceId: "price_1T3GOVID1mWgKrR7wgxlK3Np",
     description:
-      "Blue hive BSS account. After purchase, you’ll receive delivery instructions (Discord ticket, etc).",
+      "After purchase, you’ll receive delivery instructions (Discord ticket, etc).",
   },
 ];
 
@@ -40,14 +40,20 @@ export default function AccountsPage() {
       const data = (await res.json()) as { url?: string; error?: string };
 
       if (!res.ok || !data.url) {
-        throw new Error(data.error || "Failed to start checkout.");
+        throw new Error(data.error || "Checkout failed.");
       }
 
       window.location.href = data.url;
     } catch (e: unknown) {
-  const message = e instanceof Error ? e.message : "Checkout failed.";
-  setError(message);
-  setLoadingId(null);
+      const msg =
+        e instanceof Error ? e.message : "Checkout failed. Please try again.";
+      // Customer-friendly message
+      setError(
+        msg.includes("NEXT_PUBLIC_SITE_URL")
+          ? "Checkout is temporarily unavailable. Please try again in a moment."
+          : msg
+      );
+      setLoadingId(null);
     }
   }
 
@@ -56,12 +62,12 @@ export default function AccountsPage() {
       <div>
         <h1 className="text-2xl font-semibold">Accounts</h1>
         <p className="text-white/60 text-sm pt-1">
-          Click buy to go to Stripe Checkout.
+          Click buy to open secure Stripe Checkout.
         </p>
       </div>
 
       {error && (
-        <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">
+        <div className="rounded-2xl border border-red-500/25 bg-red-500/10 p-4 text-sm text-red-100">
           {error}
         </div>
       )}
@@ -70,9 +76,9 @@ export default function AccountsPage() {
         {PRODUCTS.map((p) => (
           <Card key={p.id} className="p-5">
             <div className="flex items-start justify-between gap-3">
-              <div>
+              <div className="grid gap-1">
                 <div className="font-medium">{p.name}</div>
-                <div className="text-sm text-white/60 pt-1">{p.description}</div>
+                <div className="text-sm text-white/60">{p.description}</div>
               </div>
               <div className="text-sm text-white/70">{p.priceLabel}</div>
             </div>
@@ -85,6 +91,9 @@ export default function AccountsPage() {
               >
                 {loadingId === p.id ? "Redirecting…" : "Buy"}
               </Button>
+              <div className="pt-3 text-xs text-white/45">
+                Powered by Stripe Checkout.
+              </div>
             </div>
           </Card>
         ))}
