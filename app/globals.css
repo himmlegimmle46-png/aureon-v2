@@ -31,6 +31,103 @@ body {
     #000;
 }
 
+/* Accent text utility */
+.ac-text-accent {
+  background: linear-gradient(90deg, rgba(140,200,255,1), rgba(190,140,255,1), rgba(120,240,255,1));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Logo orb animation inside navbar */
+.ac-logo-orb {
+  background:
+    radial-gradient(60% 60% at 35% 30%, rgba(140,200,255,0.55), transparent 60%),
+    radial-gradient(55% 55% at 70% 65%, rgba(190,140,255,0.45), transparent 62%),
+    radial-gradient(70% 60% at 50% 55%, rgba(120,240,255,0.28), transparent 65%);
+  filter: blur(10px);
+  opacity: 0.9;
+  animation: orb-rotate 6.5s linear infinite;
+}
+@keyframes orb-rotate {
+  from { transform: rotate(0deg) scale(1.05); }
+  to   { transform: rotate(360deg) scale(1.05); }
+}
+
+/* Active pill glow */
+.ac-nav-active {
+  background:
+    radial-gradient(80% 120% at 50% 20%, rgba(140,200,255,0.22), transparent 65%),
+    radial-gradient(90% 120% at 40% 80%, rgba(190,140,255,0.18), transparent 70%),
+    rgba(255,255,255,0.06);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.08),
+    0 0 26px rgba(140,200,255,0.16),
+    0 0 30px rgba(190,140,255,0.12);
+}
+
+/* Extra background “wow”: rotating ring + shooting stars */
+.ac-ring {
+  position: absolute;
+  inset: -35%;
+  background:
+    radial-gradient(closest-side, transparent 62%, rgba(140,200,255,0.08) 64%, transparent 70%),
+    radial-gradient(closest-side, transparent 66%, rgba(190,140,255,0.06) 68%, transparent 74%);
+  filter: blur(12px);
+  opacity: 0.55;
+  animation: ring-spin 28s linear infinite;
+  will-change: transform;
+}
+@keyframes ring-spin {
+  from { transform: rotate(0deg) scale(1.05); }
+  to   { transform: rotate(360deg) scale(1.05); }
+}
+
+/* Shooting stars layer */
+.ac-shooting {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.ac-shooting::before,
+.ac-shooting::after {
+  content: "";
+  position: absolute;
+  top: 18%;
+  left: -30%;
+  width: 45%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.75), transparent);
+  filter: blur(0.2px);
+  opacity: 0;
+  transform: rotate(-12deg);
+  animation: shoot 6.8s ease-in-out infinite;
+}
+.ac-shooting::after {
+  top: 62%;
+  width: 55%;
+  animation-delay: 3.1s;
+  transform: rotate(-9deg);
+}
+
+@keyframes shoot {
+  0%   { transform: translate3d(0,0,0) rotate(-12deg); opacity: 0; }
+  10%  { opacity: 0.55; }
+  35%  { opacity: 0.0; }
+  100% { transform: translate3d(240%, 40%, 0) rotate(-12deg); opacity: 0; }
+}
+
+/* Make aurora more noticeable */
+.ac-aurora {
+  opacity: 0.95 !important;
+  animation: aurora-pan 12s ease-in-out infinite alternate, aurora-pulse 5.5s ease-in-out infinite;
+}
+@keyframes aurora-pulse {
+  0%, 100% { filter: blur(30px) saturate(1.05); }
+  50%      { filter: blur(34px) saturate(1.25); }
+}
+
 /* Soft nebula haze */
 .ac-nebula {
   position: absolute;

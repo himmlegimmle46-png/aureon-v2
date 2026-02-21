@@ -8,14 +8,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="min-h-screen bg-black text-white">
         <div aria-hidden className="ac-bg">
-          <div className="ac-nebula" />
-          <div className="ac-stars" />
-          <div className="ac-stars2" />
-          <div className="ac-stars3" />
-          <div className="ac-aurora" />
-          <div className="ac-grain" />
-          <div className="ac-vignette" />
-        </div>
+  <div className="ac-nebula" />
+  <div className="ac-ring" />
+  <div className="ac-stars" />
+  <div className="ac-stars2" />
+  <div className="ac-stars3" />
+  <div className="ac-aurora" />
+  <div className="ac-shooting" />
+  <div className="ac-grain" />
+  <div className="ac-vignette" />
+</div>
 
         <IntroOverlay />
 

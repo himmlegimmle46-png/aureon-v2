@@ -29,7 +29,7 @@ export default function HomePage() {
         </div>
 
         <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight">
-          Aureon <span className="text-white/60">V2</span>
+          <span className="ac-text-accent">Aureon</span> <span className="text-white/60">V2</span>
         </h1>
 
         <p className="text-white/70 max-w-2xl leading-relaxed">
