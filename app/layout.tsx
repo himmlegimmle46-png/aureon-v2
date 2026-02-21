@@ -16,9 +16,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   <div className="ac-stars" />
   <div className="ac-stars2" />
   <div className="ac-aurora" />
+  <div className="ac-grain" />
   <div className="ac-vignette" />
 </div>
-
         <Navbar />
 
         <main className="container py-10">

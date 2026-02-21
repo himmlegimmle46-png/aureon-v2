@@ -125,6 +125,31 @@ export default function RustAccountsPage() {
             );
           })}
         </div>
+        
+        <Card className="p-6">
+  <h2 className="text-lg font-semibold">What you get</h2>
+  <ul className="mt-3 space-y-2 text-sm text-white/70 list-disc pl-5">
+    <li>One selected option based on your purchase</li>
+    <li>Delivery instructions after checkout</li>
+    <li>Support if you run into issues</li>
+  </ul>
+</Card>
+
+<div className="grid gap-3 sm:grid-cols-2">
+  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+    <div className="font-medium text-white/90">FAQ: Out of stock?</div>
+    <div className="pt-2 text-sm text-white/70">
+      Out-of-stock options are disabled. Check back later or contact support.
+    </div>
+  </div>
+
+  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+    <div className="font-medium text-white/90">FAQ: Checkout not redirecting?</div>
+    <div className="pt-2 text-sm text-white/70">
+      Refresh and try again. If it persists, contact support and include the option you clicked.
+    </div>
+  </div>
+</div>
 
         <div className="pt-3 text-xs text-white/45">
           Delivery instructions are shown after checkout.
