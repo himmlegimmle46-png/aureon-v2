@@ -13,83 +13,96 @@ body {
   @apply bg-black text-white;
 }
 
-/* Background */
-.ac-bg {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-}
-
-.ac-grid {
-  position: absolute;
-  inset: -50%;
-  background-image: linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
-  background-size: 42px 42px;
-  transform: rotate(12deg);
-  opacity: 0.25;
-}
-
-.ac-blob {
-  position: absolute;
-  width: 520px;
-  height: 520px;
-  filter: blur(80px);
-  opacity: 0.55;
-  border-radius: 9999px;
-}
-
-.ac-blob.one {
-  left: -180px;
-  top: -200px;
-  background: radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.55), transparent 60%);
-}
-
-.ac-blob.two {
-  right: -220px;
-  top: 10%;
-  background: radial-gradient(circle at 40% 40%, rgba(120, 180, 255, 0.35), transparent 62%);
-}
-
-.ac-blob.three {
-  left: 10%;
-  bottom: -260px;
-  background: radial-gradient(circle at 35% 35%, rgba(255, 215, 0, 0.35), transparent 62%);
-}
-
-.ac-vignette {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at center, transparent 35%, rgba(0, 0, 0, 0.75) 100%);
-}
-
-@keyframes floaty {
-  0% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  50% {
-    transform: translate3d(0, -18px, 0) scale(1.03);
-  }
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-}
-
-.ac-blob {
-  animation: floaty 8s ease-in-out infinite;
-}
-.ac-blob.two {
-  animation-duration: 10s;
-}
-.ac-blob.three {
-  animation-duration: 12s;
-}
-
-/* layout helper */
+/* Layout helper */
 .container {
   margin-inline: auto;
   width: 100%;
   max-width: 72rem;
   padding-inline: 1rem;
+}
+
+/* ===== Animated Background (no gold haze) ===== */
+.ac-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.04), transparent 55%),
+    radial-gradient(ellipse at bottom, rgba(255, 255, 255, 0.02), transparent 55%),
+    #000;
+}
+
+/* Subtle moving grid */
+.ac-grid {
+  position: absolute;
+  inset: -60%;
+  opacity: 0.22;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 56px 56px;
+  transform: rotate(12deg);
+  animation: grid-drift 18s linear infinite;
+}
+
+@keyframes grid-drift {
+  0%   { transform: rotate(12deg) translate3d(0, 0, 0); }
+  100% { transform: rotate(12deg) translate3d(120px, 80px, 0); }
+}
+
+/* Starfield (two layers for depth) */
+.ac-stars,
+.ac-stars2 {
+  position: absolute;
+  inset: -20%;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.9) 50%, transparent 55%),
+    radial-gradient(1px 1px at 30% 80%, rgba(255,255,255,0.8) 50%, transparent 55%),
+    radial-gradient(1px 1px at 55% 40%, rgba(255,255,255,0.75) 50%, transparent 55%),
+    radial-gradient(1px 1px at 70% 15%, rgba(255,255,255,0.7) 50%, transparent 55%),
+    radial-gradient(1px 1px at 85% 65%, rgba(255,255,255,0.8) 50%, transparent 55%),
+    radial-gradient(1px 1px at 15% 55%, rgba(255,255,255,0.7) 50%, transparent 55%),
+    radial-gradient(1px 1px at 45% 10%, rgba(255,255,255,0.75) 50%, transparent 55%),
+    radial-gradient(1px 1px at 95% 35%, rgba(255,255,255,0.8) 50%, transparent 55%),
+    radial-gradient(1px 1px at 5% 75%, rgba(255,255,255,0.7) 50%, transparent 55%);
+  background-repeat: repeat;
+  background-size: 420px 420px;
+  opacity: 0.22;
+  animation: stars-float 40s linear infinite;
+}
+
+.ac-stars2 {
+  opacity: 0.14;
+  background-size: 680px 680px;
+  animation-duration: 65s;
+}
+
+@keyframes stars-float {
+  0%   { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-140px, -90px, 0); }
+}
+
+/* Aurora sweep */
+.ac-aurora {
+  position: absolute;
+  inset: -40%;
+  background:
+    radial-gradient(60% 40% at 25% 45%, rgba(120, 180, 255, 0.18), transparent 55%),
+    radial-gradient(50% 35% at 70% 55%, rgba(170, 120, 255, 0.14), transparent 60%),
+    radial-gradient(55% 35% at 55% 30%, rgba(80, 220, 255, 0.12), transparent 62%);
+  filter: blur(26px);
+  opacity: 0.9;
+  animation: aurora-pan 16s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-pan {
+  0%   { transform: translate3d(-40px, 10px, 0) scale(1.02); }
+  100% { transform: translate3d(60px, -20px, 0) scale(1.06); }
+}
+
+/* Vignette for depth */
+.ac-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 35%, rgba(0, 0, 0, 0.78) 100%);
 }

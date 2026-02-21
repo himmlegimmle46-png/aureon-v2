@@ -12,12 +12,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <div aria-hidden className="ac-bg">
-          <div className="ac-grid" />
-          <div className="ac-blob one" />
-          <div className="ac-blob two" />
-          <div className="ac-blob three" />
-          <div className="ac-vignette" />
-        </div>
+  <div className="ac-grid" />
+  <div className="ac-stars" />
+  <div className="ac-stars2" />
+  <div className="ac-aurora" />
+  <div className="ac-vignette" />
+</div>
 
         <Navbar />
 
