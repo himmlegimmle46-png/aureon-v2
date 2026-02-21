@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 const tabs = [
   { href: "/", label: "Home" },
   { href: "/accounts", label: "Accounts" },
-  { href: "/terms", label: "Terms of Service" },
   { href: "/contact", label: "Contact" },
+  { href: "/terms", label: "Terms of Service" },
 ];
 
 export function Navbar() {
