@@ -24,8 +24,8 @@ export default function HomePage() {
         </h1>
 
         <p className="text-white/70 max-w-2xl leading-relaxed">
-          We sell verified Bee Swarm accounts. Purchase through secure checkout, then follow
-          delivery steps to receive your account details.
+          We sell all types of verified accounts to software. Purchase through secure checkout, then follow
+          delivery steps to receive your billing details.
         </p>
 
         <div className="flex flex-wrap gap-3 pt-1">
