@@ -40,16 +40,16 @@ export default function ContactPage() {
       </div>
 
       <Card className="p-6 grid gap-2">
-        {/* ✏️ EDIT THESE VALUES */}
-        <Row label="Email" value="your@email.com" href="mailto:your@email.com" />
+        {/* EDIT THESE VALUES */}
+        <Row label="Email" value="himmlegimmle46@gmail.com" href="mailto:himmlegimmle46@gmail.com" />
 
         <Row
           label="Discord Server"
           value="Join Server"
-          href="https://discord.gg/YOURINVITE"
+          href="https://discord.gg/knuz3yfWdU"
         />
 
-        <Row label="Discord Username" value="@yourusername" />
+        <Row label="Discord Username" value="redacted21314 (sfv) & REDACTED01234535" />
 
         <div className="pt-4 text-xs text-white/50">
           Fastest support is usually through Discord tickets after purchase.
