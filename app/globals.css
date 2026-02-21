@@ -103,7 +103,7 @@ body {
     radial-gradient(50% 35% at 70% 55%, rgba(170, 120, 255, 0.14), transparent 62%),
     radial-gradient(55% 35% at 55% 30%, rgba(80, 220, 255, 0.12), transparent 64%);
   filter: blur(28px);
-  opacity: 0.95;
+  opacity: 0.8;
   animation: aurora-pan 18s ease-in-out infinite alternate;
   will-change: transform;
 }

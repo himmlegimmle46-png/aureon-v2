@@ -21,9 +21,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 </div>
         <Navbar />
 
-        <main className="container py-10">
-          <RouteTransition>{children}</RouteTransition>
-        </main>
+        <main className="flex-1 w-full px-4 pt-16 sm:pt-20 pb-20">
+  <div className="mx-auto w-full max-w-6xl">
+    {children}
+  </div>
+</main>
 
         <footer className="container pb-10 pt-4 text-xs text-white/50">
           © {new Date().getFullYear()} Aureon V2
