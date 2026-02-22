@@ -1,6 +1,6 @@
 import "./globals.css";
 import { Navbar } from "../components/navbar";
-import { IntroOverlay } from "../components/intro-overlay";
+import IntroOverlay from "../components/intro-overlay";
 import { RouteTransition } from "../components/route-transition";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
