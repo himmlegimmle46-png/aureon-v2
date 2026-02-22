@@ -32,7 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
           <footer className="px-4 pb-8">
             <div className="mx-auto w-full max-w-6xl text-xs text-white/35">
-              © {new Date().getFullYear()} Aureon V2
+              © {new Date().getFullYear()} Aureon
             </div>
           </footer>
         </div>
