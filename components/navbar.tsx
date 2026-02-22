@@ -3,64 +3,41 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const links = [
+const LINKS = [
   { href: "/", label: "Home" },
   { href: "/accounts", label: "Accounts" },
   { href: "/contact", label: "Contact" },
   { href: "/terms", label: "Terms of Service" },
 ];
 
-function cn(...s: Array<string | false | undefined>) {
-  return s.filter(Boolean).join(" ");
-}
-
 export function Navbar() {
   const pathname = usePathname();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40">
-      {/* solid bar background */}
-      <div className="absolute inset-0 ac-topbar" />
-
-      <div className="relative mx-auto w-full max-w-6xl px-4">
-        <div className="h-14 flex items-center justify-between gap-4">
-          {/* Left brand (no logo) */}
-          <Link href="/" className="group flex items-baseline gap-2">
-            <span className="text-sm font-semibold tracking-tight">
-              <span className="ac-text-accent">Aureon</span>{" "}
-              <span className="text-white/55">V2</span>
-            </span>
-            <span className="hidden sm:inline text-[11px] text-white/40">
-              listings • checkout • delivery
-            </span>
-          </Link>
-
-          {/* Right nav */}
-          <nav className="flex items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-1">
-            {links.map((l) => {
-              const active =
-                pathname === l.href ||
-                (l.href !== "/" && pathname.startsWith(l.href));
-
+    <header className="fixed inset-x-0 top-0 z-50 pointer-events-none">
+      {/* add top padding so glow/shadow isn't clipped */}
+      <div className="pointer-events-auto mx-auto flex max-w-6xl justify-end px-4 pt-4 overflow-visible">
+        <nav className="overflow-visible rounded-2xl border border-white/10 bg-black/35 backdrop-blur-xl px-2 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.45)] filter drop-shadow-[0_0_18px_rgba(140,90,255,0.25)]">
+          <ul className="flex items-center gap-1 text-sm text-white/80">
+            {LINKS.map((l) => {
+              const active = pathname === l.href;
               return (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  className={cn(
-                    "relative rounded-lg px-3 py-2 text-sm transition",
-                    "text-white/70 hover:text-white",
-                    active && "text-white"
-                  )}
-                >
-                  {active && (
-                    <span className="absolute inset-0 -z-10 rounded-lg ac-nav-active" />
-                  )}
-                  {l.label}
-                </Link>
+                <li key={l.href}>
+                  <Link
+                    href={l.href}
+                    className={[
+                      "rounded-xl px-3 py-2 transition",
+                      "hover:bg-white/10",
+                      active ? "bg-white/10 text-white" : "text-white/80",
+                    ].join(" ")}
+                  >
+                    {l.label}
+                  </Link>
+                </li>
               );
             })}
-          </nav>
-        </div>
+          </ul>
+        </nav>
       </div>
     </header>
   );

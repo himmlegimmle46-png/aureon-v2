@@ -1,128 +1,100 @@
-import { Card, Button } from "../components/ui";
-
-function Pill({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
-      {children}
-    </span>
-  );
-}
-
-function FAQItem({ q, a }: { q: string; a: string }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-      <div className="font-medium text-white/90">{q}</div>
-      <div className="pt-2 text-sm text-white/70 leading-relaxed">{a}</div>
-    </div>
-  );
-}
+// app/page.tsx
+import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <div className="grid gap-10">
-      {/* Hero */}
-      <div className="grid gap-4">
-        <div className="flex flex-wrap gap-2">
-          <Pill>Fast checkout</Pill>
-          <Pill>Digital delivery</Pill>
-          <Pill>Support ready</Pill>
+    <div className="mx-auto w-full max-w-5xl">
+      {/* HERO */}
+      <section className="pt-8 sm:pt-12">
+        <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
+          <span>Fast checkout</span>
+          <span className="h-1 w-1 rounded-full bg-white/30" />
+          <span>Digital delivery</span>
+          <span className="h-1 w-1 rounded-full bg-white/30" />
+          <span>Support ready</span>
         </div>
 
-        <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight">
-          <span className="ac-text-accent">Aureon</span> <span className="text-white/60">V2</span>
-        </h1>
+        <div className="mt-5">
+          <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight text-white">
+            Aureon V2
+          </h1>
 
-        <p className="text-white/70 max-w-2xl leading-relaxed">
-          Clean storefront for account listings with a simple purchase flow.
-          Browse listings, pay, then follow the delivery instructions.
-        </p>
+          <p className="mt-3 max-w-2xl text-sm sm:text-base text-white/70">
+            Browse listings, checkout, then follow the delivery instructions. Simple and clean.
+          </p>
 
-        <div className="flex flex-wrap gap-3 pt-1">
-          <Button href="/accounts">Browse Accounts</Button>
-          <Button href="/contact" variant="ghost">Contact</Button>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              href="/accounts"
+              className="rounded-xl border border-white/10 bg-white/10 px-5 py-2 text-sm text-white hover:bg-white/15 transition"
+            >
+              Browse Accounts
+            </Link>
+
+            <Link
+              href="/contact"
+              className="rounded-xl border border-white/10 bg-black/20 px-5 py-2 text-sm text-white/90 hover:bg-white/10 transition"
+            >
+              Contact
+            </Link>
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* How it works */}
-      <Card className="p-6">
-        <h2 className="text-lg font-semibold">How it works</h2>
+      {/* HOW IT WORKS */}
+      <section className="mt-10 sm:mt-12 rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-6">
+        <h2 className="text-lg font-semibold text-white">How it works</h2>
+
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <div className="text-xs text-white/60">Step 1</div>
-            <div className="pt-1 font-medium">Pick a listing</div>
-            <div className="pt-2 text-sm text-white/70">Choose what you want from the category page.</div>
+          <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div className="text-xs text-white/50">Step 1</div>
+            <div className="mt-1 font-medium text-white">Pick a listing</div>
+            <p className="mt-1 text-sm text-white/65">
+              Choose what you want from the Accounts page.
+            </p>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <div className="text-xs text-white/60">Step 2</div>
-            <div className="pt-1 font-medium">Checkout</div>
-            <div className="pt-2 text-sm text-white/70">Complete payment and you’ll be redirected back.</div>
+
+          <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div className="text-xs text-white/50">Step 2</div>
+            <div className="mt-1 font-medium text-white">Checkout</div>
+            <p className="mt-1 text-sm text-white/65">
+              Complete payment and you’ll be redirected back.
+            </p>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <div className="text-xs text-white/60">Step 3</div>
-            <div className="pt-1 font-medium">Delivery</div>
-            <div className="pt-2 text-sm text-white/70">Follow the delivery instructions shown after checkout.</div>
-          </div>
-        </div>
-      </Card>
 
-      {/* Why us / rules */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold">What you can expect</h2>
-          <ul className="mt-3 space-y-2 text-sm text-white/70 list-disc pl-5">
-            <li>Clear, organized listings</li>
-            <li>Fast redirect to checkout</li>
-            <li>Support if something goes wrong</li>
-          </ul>
-        </Card>
-
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold">Important</h2>
-          <ul className="mt-3 space-y-2 text-sm text-white/70 list-disc pl-5">
-            <li>Contact support before opening disputes</li>
-            <li>Digital delivery means sales may be final once delivery starts</li>
-            <li>Using the site means you agree to the Terms</li>
-          </ul>
-        </Card>
-      </div>
-
-      {/* FAQ */}
-      <div className="grid gap-4">
-        <div>
-          <h2 className="text-lg font-semibold">FAQ</h2>
-          <p className="text-sm text-white/60 pt-1">Quick answers before you buy.</p>
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <FAQItem
-            q="How do I receive delivery?"
-            a="After checkout, follow the delivery instructions. If your store uses Discord tickets, open a ticket and provide the required info."
-          />
-          <FAQItem
-            q="What if something fails?"
-            a="If checkout doesn’t redirect or you hit an error, refresh and try again. If it persists, use the Contact page."
-          />
-          <FAQItem
-            q="Can listings be out of stock?"
-            a="Yes. Out-of-stock options are disabled and show 'Sold out'."
-          />
-          <FAQItem
-            q="Where are the rules?"
-            a="Everything important is listed on the Terms of Service page."
-          />
-        </div>
-      </div>
-
-      {/* CTA */}
-      <Card className="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="text-white/90 font-medium">Ready to view listings?</div>
-          <div className="text-sm text-white/60 pt-1">
-            Go to Accounts and pick a category.
+          <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div className="text-xs text-white/50">Step 3</div>
+            <div className="mt-1 font-medium text-white">Delivery</div>
+            <p className="mt-1 text-sm text-white/65">
+              Follow the instructions shown after checkout.
+            </p>
           </div>
         </div>
-        <Button href="/accounts">Go to Accounts</Button>
-      </Card>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div className="font-medium text-white">Support</div>
+            <p className="mt-1 text-sm text-white/65">
+              If something fails (redirect / error), refresh and try again. If it persists, use Contact.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div className="font-medium text-white">Terms</div>
+            <p className="mt-1 text-sm text-white/65">
+              Using the site means you agree to the Terms of Service.
+            </p>
+            <Link
+              className="mt-2 inline-block text-sm text-white/80 underline underline-offset-4"
+              href="/terms"
+            >
+              View Terms
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <div className="h-10 sm:h-14" />
     </div>
   );
 }
