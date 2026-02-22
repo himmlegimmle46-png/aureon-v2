@@ -2,36 +2,41 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export default function HomePage() {
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const [delivered, setDelivered] = useState<string>("✓ Recently delivered: 1 account (just now)");
   const [showSticky, setShowSticky] = useState(false);
 
-  const deliveredPool = useMemo(
+  // Particle positions (stable, no random jitter)
+  const particles = useMemo(
     () => [
-      "✓ Recently delivered: 1 account (just now)",
-      "✓ Recently delivered: 2 accounts (today)",
-      "✓ Recently delivered: 1 tool license (today)",
-      "✓ Recently delivered: 3 accounts (today)",
-      "✓ Recently delivered: 1 account (a few minutes ago)",
-      "✓ Recently delivered: 2 tool licenses (today)",
+      [12, 20, 0],
+      [18, 64, 220],
+      [26, 38, 480],
+      [32, 78, 120],
+      [44, 24, 360],
+      [52, 58, 90],
+      [62, 30, 520],
+      [70, 72, 260],
+      [78, 42, 610],
+      [84, 18, 140],
+      [22, 82, 330],
+      [40, 12, 570],
+      [60, 86, 190],
+      [88, 62, 420],
     ],
     []
   );
 
-  // Mouse-reactive glow (subtle)
+  // Mouse-reactive glow (FULL viewport, never clipped)
   useEffect(() => {
-    const el = rootRef.current;
-    if (!el) return;
+    const root = document.documentElement;
 
     const onMove = (e: MouseEvent) => {
-      const r = el.getBoundingClientRect();
-      const x = ((e.clientX - r.left) / r.width) * 100;
-      const y = ((e.clientY - r.top) / r.height) * 100;
-      el.style.setProperty("--mx", `${x}%`);
-      el.style.setProperty("--my", `${y}%`);
+      const x = (e.clientX / window.innerWidth) * 100;
+      const y = (e.clientY / window.innerHeight) * 100;
+      root.style.setProperty("--mx", `${x}%`);
+      root.style.setProperty("--my", `${y}%`);
     };
 
     window.addEventListener("mousemove", onMove, { passive: true });
@@ -54,52 +59,43 @@ export default function HomePage() {
     return () => io.disconnect();
   }, []);
 
-  // Sticky CTA + ticker
+  // Sticky CTA
   useEffect(() => {
     const onScroll = () => setShowSticky(window.scrollY > 220);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-
-    const t = setInterval(() => {
-      const next = deliveredPool[Math.floor(Math.random() * deliveredPool.length)];
-      setDelivered(next);
-    }, 6500);
-
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      clearInterval(t);
-    };
-  }, [deliveredPool]);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <div ref={rootRef} className="mx-auto w-full max-w-5xl">
+    <div className="mx-auto w-full max-w-5xl">
       <style>{`
-        /* ===== Premium motion + polish (scoped to this page) ===== */
         @media (prefers-reduced-motion: reduce) {
-          .aur-float, .aur-pulse, .aur-shift, .aur-reveal, .aur-sheen { animation: none !important; }
+          .aur-float, .aur-pulse, .aur-title, .aur-reveal, .aur-sheen { animation: none !important; }
           .aur-reveal { transform: none !important; filter: none !important; opacity: 1 !important; }
         }
 
-        /* Mouse-reactive hero glow */
+        /* FULL-VIEWPORT mouse glow (not clipped by max-w container) */
         .aur-heroGlow {
-          position: absolute;
-          inset: -120px;
+          position: fixed;
+          inset: -140px; /* allow blur to extend beyond edges */
+          z-index: 0;
           pointer-events: none;
           background:
-            radial-gradient(520px 380px at var(--mx, 55%) var(--my, 45%),
+            radial-gradient(640px 520px at var(--mx, 55%) var(--my, 45%),
               rgba(140,90,255,0.20),
-              transparent 60%),
-            radial-gradient(520px 380px at calc(var(--mx, 55%) + 10%) calc(var(--my, 45%) + 10%),
+              transparent 62%),
+            radial-gradient(640px 520px at calc(var(--mx, 55%) + 12%) calc(var(--my, 45%) + 12%),
               rgba(80,200,255,0.14),
-              transparent 62%);
-          filter: blur(22px);
+              transparent 65%);
+          filter: blur(26px);
           opacity: 0.9;
         }
 
         /* Floating particles behind logo (subtle) */
         .aur-particles {
           position: absolute;
-          inset: -80px;
+          inset: -90px;
           pointer-events: none;
           overflow: hidden;
           border-radius: 9999px;
@@ -114,16 +110,14 @@ export default function HomePage() {
           filter: drop-shadow(0 0 10px rgba(140,90,255,0.25));
           opacity: 0.7;
         }
-        .aur-float {
-          animation: aurFloat 7.5s ease-in-out infinite;
-        }
+        .aur-float { animation: aurFloat 7.5s ease-in-out infinite; }
         @keyframes aurFloat {
           0% { transform: translateY(10px); opacity: .35; }
           50% { transform: translateY(-12px); opacity: .75; }
           100% { transform: translateY(10px); opacity: .35; }
         }
 
-        /* Gradient title (readable) + subtle blend sheen */
+        /* Gradient title + subtle sheen */
         @keyframes aurShift {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
@@ -178,8 +172,10 @@ export default function HomePage() {
           0%,100% { transform: scale(1); opacity: .65; }
           50% { transform: scale(1.18); opacity: 1; }
         }
+        .aur-delay-250 { animation-delay: 250ms; }
+        .aur-delay-450 { animation-delay: 450ms; }
 
-        /* Buttons: premium hover glow + lift */
+        /* Buttons: hover glow + lift */
         .aur-btn {
           position: relative;
           overflow: hidden;
@@ -200,19 +196,18 @@ export default function HomePage() {
           filter: blur(10px);
           pointer-events: none;
         }
-        .aur-btn:hover {
-          transform: translateY(-1px);
-        }
-        .aur-btn:hover::before {
-          opacity: 1;
-        }
+        .aur-btn:hover { transform: translateY(-1px); }
+        .aur-btn:hover::before { opacity: 1; }
 
         /* Scroll reveal */
         .aur-reveal {
           opacity: 0;
           transform: translateY(10px);
           filter: blur(6px);
-          transition: opacity 650ms cubic-bezier(.2,.8,.2,1), transform 650ms cubic-bezier(.2,.8,.2,1), filter 650ms cubic-bezier(.2,.8,.2,1);
+          transition:
+            opacity 650ms cubic-bezier(.2,.8,.2,1),
+            transform 650ms cubic-bezier(.2,.8,.2,1),
+            filter 650ms cubic-bezier(.2,.8,.2,1);
         }
         .aur-reveal.is-in {
           opacity: 1;
@@ -221,10 +216,13 @@ export default function HomePage() {
         }
       `}</style>
 
-      {/* Sticky CTA (appears on scroll) */}
+      {/* Full viewport glow layer */}
+      <div aria-hidden className="aur-heroGlow" />
+
+      {/* Sticky CTA */}
       <div
         className={[
-          "fixed right-4 bottom-4 z-[70] transition-all duration-300",
+          "fixed right-4 bottom-4 z-70 transition-all duration-300",
           showSticky ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none",
         ].join(" ")}
       >
@@ -237,20 +235,12 @@ export default function HomePage() {
       </div>
 
       {/* HERO */}
-      <section className="pt-12 sm:pt-16 relative">
-        <div className="aur-heroGlow" />
-
-        <div className="flex flex-col items-center text-center relative">
-          {/* Logo cluster */}
+      <section className="pt-12 sm:pt-16 relative z-10">
+        <div className="flex flex-col items-center text-center">
+          {/* Logo */}
           <div className="relative">
             <div className="aur-particles">
-              {/* 14 tiny particles with fixed positions so it’s stable */}
-              {[
-                [12, 20, 0], [18, 64, 220], [26, 38, 480], [32, 78, 120],
-                [44, 24, 360], [52, 58, 90], [62, 30, 520], [70, 72, 260],
-                [78, 42, 610], [84, 18, 140], [22, 82, 330], [40, 12, 570],
-                [60, 86, 190], [88, 62, 420],
-              ].map(([x, y, d], i) => (
+              {particles.map(([x, y, d], i) => (
                 <span
                   key={i}
                   className="aur-float"
@@ -276,7 +266,7 @@ export default function HomePage() {
             />
           </div>
 
-          {/* Title with gradient shift + subtle sheen */}
+          {/* Title */}
           <div className="aur-titleWrap mt-6">
             <h1 className="text-5xl sm:text-6xl font-semibold tracking-tight aur-title">
               Aureon
@@ -285,26 +275,23 @@ export default function HomePage() {
           </div>
 
           {/* Live status row */}
-          {/* Live status row */}
-<div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-xs text-white/60">
-  <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1">
-    <span className="aur-dot aur-pulse" /> Secure checkout
-  </span>
-
-  <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1">
-    <span className="aur-dot aur-pulse aur-delay-250" /> Digital delivery
-  </span>
-
-  <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1">
-    <span className="aur-dot aur-pulse aur-delay-450" /> Support ready
-  </span>
-</div>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-xs text-white/60">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1">
+              <span className="aur-dot aur-pulse" /> Secure checkout
+            </span>
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1">
+              <span className="aur-dot aur-pulse aur-delay-250" /> Digital delivery
+            </span>
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1">
+              <span className="aur-dot aur-pulse aur-delay-450" /> Support ready
+            </span>
+          </div>
 
           <p className="mt-4 max-w-xl text-sm sm:text-base text-white/70">
             Browse listings, checkout, then follow the delivery instructions.
           </p>
 
-          {/* Buttons with better hover */}
+          {/* Buttons */}
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link
               href="/accounts"
@@ -319,9 +306,6 @@ export default function HomePage() {
               Contact
             </Link>
           </div>
-
-          {/* Recently delivered ticker */}
-          <div className="mt-4 text-xs text-white/55">{delivered}</div>
         </div>
 
         {/* How it works (scroll reveal) */}
