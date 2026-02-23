@@ -345,3 +345,93 @@ body {
   0%   { opacity: 0; transform: translate3d(0, 10px, 0); }
   100% { opacity: 1; transform: translate3d(0, 0, 0); }
 }
+
+/* =========================================
+   Aureon - Aurora glow + moving border
+   Use by adding class: aur-glow
+   ========================================= */
+
+@keyframes aurGlowPulse {
+  0%   { opacity: 0.25; transform: scale(0.99); }
+  50%  { opacity: 0.70; transform: scale(1.02); }
+  100% { opacity: 0.25; transform: scale(0.99); }
+}
+
+@keyframes aurBorderFlow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* The universal hover class */
+.aur-glow {
+  position: relative;
+  isolation: isolate;
+  transform: translateZ(0);
+  transition: transform 180ms ease, filter 180ms ease;
+  will-change: transform;
+}
+
+/* Moving aurora BORDER */
+.aur-glow::before {
+  content: "";
+  position: absolute;
+  inset: -2px;                /* border thickness */
+  border-radius: inherit;
+  padding: 2px;               /* must match inset thickness */
+  background: linear-gradient(
+    90deg,
+    rgba(90, 220, 255, 0.95),
+    rgba(140, 90, 255, 0.95),
+    rgba(255, 130, 240, 0.80),
+    rgba(90, 220, 255, 0.95)
+  );
+  background-size: 300% 300%;
+  animation: aurBorderFlow 6s ease-in-out infinite;
+  opacity: 0;
+  filter: blur(0px);
+  z-index: -1;
+
+  /* Punch the middle out so it's ONLY a border ring */
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+}
+
+/* Soft ambient glow behind it */
+.aur-glow::after {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  border-radius: inherit;
+  background:
+    radial-gradient(700px 240px at 20% 15%, rgba(90, 220, 255, 0.20), transparent 60%),
+    radial-gradient(700px 240px at 80% 25%, rgba(140, 90, 255, 0.22), transparent 60%),
+    radial-gradient(700px 260px at 50% 90%, rgba(255, 130, 240, 0.14), transparent 60%);
+  opacity: 0;
+  filter: blur(14px);
+  z-index: -2;
+}
+
+/* Hover/Foucus behavior */
+.aur-glow:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+
+.aur-glow:hover::before {
+  opacity: 1;
+}
+
+.aur-glow:hover::after {
+  opacity: 1;
+  animation: aurGlowPulse 2.6s ease-in-out infinite;
+}
+
+/* Keyboard users */
+.aur-glow:focus-visible::before,
+.aur-glow:focus-visible::after {
+  opacity: 1;
+}
