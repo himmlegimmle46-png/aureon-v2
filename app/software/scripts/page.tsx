@@ -88,7 +88,7 @@ export default function MacrosPage() {
         <div className="grid gap-1">
           <div className="text-lg font-semibold">Available options</div>
           <div className="text-sm text-white/60">Choose an option below.</div>
-          <div className="pt-2 text-xs text-white/45">Platform: Windows • Delivery after checkout</div>
+          <div className="pt-2 text-xs text-white/45">Delivery instructions are shown after checkout, make sure to join the discord to see the immediate stock.</div>
         </div>
 
         <div className="mt-4 grid divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
