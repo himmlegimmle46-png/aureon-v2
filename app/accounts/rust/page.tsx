@@ -139,7 +139,7 @@ export default function RustAccountsPage() {
   <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
     <div className="font-medium text-white/90">FAQ: Out of stock?</div>
     <div className="pt-2 text-sm text-white/70">
-      Out-of-stock options are disabled. Check back later or contact support.
+      Out-of-stock options are not always disabled. Join the discord to make sure they're in stock before purchasing.
     </div>
   </div>
 
