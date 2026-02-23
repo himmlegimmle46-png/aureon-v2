@@ -27,21 +27,6 @@ export default function HomePage() {
     []
   );
 
-  // Smaller + softer cursor glow
-  useEffect(() => {
-    const root = document.documentElement;
-
-    const onMove = (e: MouseEvent) => {
-      const x = (e.clientX / window.innerWidth) * 100;
-      const y = (e.clientY / window.innerHeight) * 100;
-      root.style.setProperty("--mx", `${x}%`);
-      root.style.setProperty("--my", `${y}%`);
-    };
-
-    window.addEventListener("mousemove", onMove, { passive: true });
-    return () => window.removeEventListener("mousemove", onMove);
-  }, []);
-
   // Scroll reveal
   useEffect(() => {
     const els = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
@@ -69,28 +54,6 @@ export default function HomePage() {
   return (
     <div className="mx-auto w-full max-w-5xl">
       <style>{`
-        /* ===== Smaller, softer cursor glow ===== */
-        .aur-heroGlow {
-          position: fixed;
-          inset: -80px;
-          z-index: 0;
-          pointer-events: none;
-          background:
-            radial-gradient(
-              260px 200px at var(--mx, 55%) var(--my, 45%),
-              rgba(140,90,255,0.12),
-              transparent 70%
-            ),
-            radial-gradient(
-              260px 200px at calc(var(--mx, 55%) + 6%) calc(var(--my, 45%) + 6%),
-              rgba(80,200,255,0.08),
-              transparent 75%
-            );
-          filter: blur(18px);
-          opacity: 0.6;
-        }
-
-        /* Floating particles */
         .aur-particles {
           position: absolute;
           inset: -90px;
@@ -116,7 +79,6 @@ export default function HomePage() {
           100% { transform: translateY(10px); opacity: .35; }
         }
 
-        /* Gradient title */
         @keyframes aurShift {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
@@ -137,17 +99,13 @@ export default function HomePage() {
           text-shadow: 0 0 18px rgba(140,90,255,0.14);
         }
 
-        /* Buttons */
         .aur-btn {
-          position: relative;
-          overflow: hidden;
           transition: transform 180ms ease;
         }
         .aur-btn:hover {
           transform: translateY(-1px);
         }
 
-        /* Scroll reveal */
         .aur-reveal {
           opacity: 0;
           transform: translateY(10px);
@@ -160,9 +118,6 @@ export default function HomePage() {
           filter: blur(0);
         }
       `}</style>
-
-      {/* Cursor glow layer */}
-      <div aria-hidden className="aur-heroGlow" />
 
       {/* Sticky CTA */}
       <div
