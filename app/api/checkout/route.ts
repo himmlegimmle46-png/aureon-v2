@@ -4,24 +4,13 @@ export const runtime = "nodejs";
 
 type CheckoutBody = { priceId?: string };
 
-// This is exactly what Stripe shows in their guide
-const MANAGED_PAYMENTS_STRIPE_VERSION =
-  "2025-03-31.basil; managed_payments_preview=v1";
-
-// Extend the session params to include the preview field (types may not know it yet)
-type ManagedPaymentsParams = Stripe.Checkout.SessionCreateParams & {
-  managed_payments: { enabled: boolean };
-};
-
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) throw new Error("Missing STRIPE_SECRET_KEY");
 
-  // IMPORTANT:
-  // Put the preview flag in apiVersion so Stripe sends the right Stripe-Version header.
-  // We cast through unknown because Stripe's TS types won't include preview variants.
+  // Normal Stripe client (no Managed Payments preview)
   return new Stripe(key, {
-    apiVersion: MANAGED_PAYMENTS_STRIPE_VERSION as unknown as Stripe.LatestApiVersion,
+    apiVersion: "2026-01-28.clover",
   });
 }
 
@@ -57,22 +46,18 @@ export async function POST(req: Request) {
 
     const stripe = getStripe();
 
-    const sessionParams: ManagedPaymentsParams = {
+    const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${origin}/checkout/success`,
       cancel_url: `${origin}/checkout/cancel`,
 
-      // ✅ Managed Payments (what the Stripe setup page wants)
-      managed_payments: { enabled: true },
+      // If you want Stripe to collect customer email automatically:
+      // customer_email: body.email,
 
-      // automatic_tax: { enabled: true }, // optional later
-    };
-
-    // No second argument here (this fixes your runtime error)
-    const session = await stripe.checkout.sessions.create(
-      sessionParams as unknown as Stripe.Checkout.SessionCreateParams
-    );
+      // Taxes (leave off unless you actually want Stripe Tax):
+      // automatic_tax: { enabled: true },
+    });
 
     return Response.json({ url: session.url });
   } catch (err: unknown) {
