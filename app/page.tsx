@@ -166,10 +166,24 @@ export default function HomePage() {
           </p>
 
           <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Link href="/accounts" className="aur-btn rounded-xl border border-white/10 bg-white/10 px-6 py-2 text-sm text-white">
+            <Link
+              href="/accounts"
+              className="aur-btn rounded-xl border border-white/10 bg-white/10 px-6 py-2 text-sm text-white"
+            >
               Browse Accounts
             </Link>
-            <Link href="/contact" className="aur-btn rounded-xl border border-white/10 bg-black/20 px-6 py-2 text-sm text-white/90">
+
+            <Link
+              href="/software"
+              className="aur-btn rounded-xl border border-white/10 bg-white/10 px-6 py-2 text-sm text-white"
+            >
+              Software
+            </Link>
+
+            <Link
+              href="/contact"
+              className="aur-btn rounded-xl border border-white/10 bg-black/20 px-6 py-2 text-sm text-white/90"
+            >
               Contact
             </Link>
           </div>
