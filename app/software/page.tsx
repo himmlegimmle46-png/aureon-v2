@@ -35,7 +35,7 @@ export default function SoftwareHubPage() {
       <div>
         <h1 className="text-2xl font-semibold">Software’s</h1>
         <p className="text-sm text-white/60 pt-1">
-          Choose a category to view available software listings.
+          Choose a category to view available software listings. Join the discord to see the immediate stock updates and new releases.
         </p>
       </div>
 
