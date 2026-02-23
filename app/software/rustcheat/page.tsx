@@ -14,24 +14,24 @@ type Variant = {
 
 const TOOL_KEY_VARIANTS: Variant[] = [
   {
-    id: "basic",
-    label: "Basic key (single device)",
-    priceLabel: "$10.00",
-    priceId: "price_REPLACE_ME_BASIC",
+    id: "Serenity Cheat",
+    label: "Serenity Cheat 1 day",
+    priceLabel: "$4.99",
+    priceId: "price_1T3vfmISP3QHCCrMLigfx9PB",
     inStock: true,
   },
   {
-    id: "pro",
-    label: "Pro key (multi device)",
-    priceLabel: "$25.00",
-    priceId: "price_REPLACE_ME_PRO",
+    id: "Serenity Cheat",
+    label: "Serenity Cheat 7 days",
+    priceLabel: "$24.99",
+    priceId: "price_1T3vg7ISP3QHCCrMg4etsKtd",
     inStock: true,
   },
   {
-    id: "lifetime",
-    label: "Lifetime key",
-    priceLabel: "$60.00",
-    priceId: "price_REPLACE_ME_LIFETIME",
+    id: "Serenity Cheat",
+    label: "Serenity Cheat 30 days",
+    priceLabel: "$49.99",
+    priceId: "price_1T3vgPISP3QHCCrM0qcMMcMR",
     inStock: true,
   },
 ];

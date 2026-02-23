@@ -14,17 +14,24 @@ type Variant = {
 
 const MACRO_VARIANTS: Variant[] = [
   {
-    id: "basic",
-    label: "Basic macro pack",
-    priceLabel: "$5.00",
-    priceId: "price_REPLACE_ME_MACRO_BASIC",
+    id: "Evade Scripts",
+    label: "Evade Scripts 30 days",
+    priceLabel: "$25.00",
+    priceId: "price_1T3vdNISP3QHCCrMxL6U5ByH",
     inStock: true,
   },
   {
-    id: "pro",
-    label: "Pro macro pack + setup help",
-    priceLabel: "$15.00",
-    priceId: "price_REPLACE_ME_MACRO_PRO",
+    id: "Evade Scripts",
+    label: "Evade Scripts 90 days",
+    priceLabel: "$50.00",
+    priceId: "price_1T3vdnISP3QHCCrMWQMTjRk0",
+    inStock: true,
+  },
+  {
+    id: "Evade Scripts",
+    label: "Evade Scripts lifetime",
+    priceLabel: "$100.000",
+    priceId: "price_1T3veCISP3QHCCrM9Dj1oxM3",
     inStock: true,
   },
 ];
@@ -132,7 +139,7 @@ export default function MacrosPage() {
         </div>
 
         <div className="pt-3 text-xs text-white/45">
-          Replace the <span className="text-white/70">price_REPLACE_ME_*</span> values with your Stripe Price IDs.
+          Delivery instructions are shown after checkout.
         </div>
       </Card>
     </div>

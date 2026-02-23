@@ -2,19 +2,25 @@ import Link from "next/link";
 import { Card } from "../../components/ui";
 
 export default function SoftwareHubPage() {
-  // ✅ EASY EDIT (change text/labels/paths later if you want)
+  // ✅ EASY EDIT (change text/labels/paths later)
   const CARDS = [
     {
-      href: "/software/tool-keys",
-      title: "Tool Keys",
+      href: "/software/rustcheat",
+      title: "Rust Cheats & Keys",
       desc: "Keys, licenses, and access options",
       meta: "Instant delivery • multiple options",
     },
     {
-      href: "/software/macros",
-      title: "Macros / Utilities",
-      desc: "Automation tools and extras",
+      href: "/software/scripts",
+      title: "Rust Recoil Scripts",
+      desc: "Rust Scripts",
       meta: "Windows • setup guide included",
+    },
+    {
+      href: "/software/spoofers",
+      title: "Spoofers",
+      desc: "Spoofing / bypass software",
+      meta: "Popular options • instant delivery",
     },
   ] as const;
 
