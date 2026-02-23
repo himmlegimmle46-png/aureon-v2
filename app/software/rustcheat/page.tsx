@@ -66,7 +66,7 @@ export default function ToolKeysPage() {
     <div className="grid gap-6">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Tool Keys</h1>
+          <h1 className="text-2xl font-semibold">Rust Cheats</h1>
           <p className="text-sm text-white/60 pt-1">Licenses • instant delivery</p>
         </div>
 
@@ -139,7 +139,7 @@ export default function ToolKeysPage() {
         </div>
 
         <div className="pt-3 text-xs text-white/45">
-          Replace the <span className="text-white/70">price_REPLACE_ME_*</span> values with your Stripe Price IDs.
+          Delivery instructions are shown after checkout.
         </div>
       </Card>
     </div>

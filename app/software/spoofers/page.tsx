@@ -66,8 +66,8 @@ export default function OtherSoftwarePage() {
     <div className="grid gap-6">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Tools (Other)</h1>
-          <p className="text-sm text-white/60 pt-1">Software • access tiers</p>
+          <h1 className="text-2xl font-semibold">HWID Spoofer</h1>
+          <p className="text-sm text-white/60 pt-1">Hardware Spoofer</p>
         </div>
 
         <Link

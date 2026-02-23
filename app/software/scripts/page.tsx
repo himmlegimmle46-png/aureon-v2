@@ -66,8 +66,8 @@ export default function MacrosPage() {
     <div className="grid gap-6">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Macros / Utilities</h1>
-          <p className="text-sm text-white/60 pt-1">Tools • setup options</p>
+          <h1 className="text-2xl font-semibold">Rust Recoil Scripts</h1>
+          <p className="text-sm text-white/60 pt-1">Recoil Scripts</p>
         </div>
 
         <Link

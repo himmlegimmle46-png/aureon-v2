@@ -6,7 +6,7 @@ export default function SoftwareHubPage() {
   const CARDS = [
     {
       href: "/software/rustcheat",
-      title: "Rust Cheats & Keys",
+      title: "Rust Cheats",
       desc: "Keys, licenses, and access options",
       meta: "Instant delivery • multiple options",
     },
@@ -21,6 +21,12 @@ export default function SoftwareHubPage() {
       title: "Spoofers",
       desc: "Spoofing / bypass software",
       meta: "Popular options • instant delivery",
+    },
+    {
+      href: "/software/arcraiderscheat",
+      title: "Arc Raiders Cheat",
+      desc: "Arc Raiders Cheats",
+      meta: "Instant delivery • simple checkout",
     },
   ] as const;
 
