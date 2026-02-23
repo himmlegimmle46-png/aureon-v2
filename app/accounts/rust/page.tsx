@@ -90,7 +90,7 @@ export default function RustAccountsPage() {
 
       <Card className="p-5">
         <div className="grid gap-1">
-          <div className="text-lg font-semibold">Rust Temporary Account</div>
+          <div className="text-lg font-semibold">Rust NFA Account</div>
           <div className="text-sm text-white/60">Choose an option below.</div>
           <div className="pt-2 text-xs text-white/45">OS: All • Game client: Steam</div>
         </div>
@@ -139,7 +139,7 @@ export default function RustAccountsPage() {
   <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
     <div className="font-medium text-white/90">FAQ: Out of stock?</div>
     <div className="pt-2 text-sm text-white/70">
-      Out-of-stock options are not always disabled. Join the discord to make sure they're in stock before purchasing.
+      Out-of-stock options are not always disabled. Join the discord to make sure they are in stock before purchasing.
     </div>
   </div>
 
