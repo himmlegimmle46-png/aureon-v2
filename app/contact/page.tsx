@@ -46,7 +46,7 @@ export default function ContactPage() {
         <Row
           label="Discord Server"
           value="Join Server"
-          href="https://discord.gg/knuz3yfWdU"
+          href="https://discord.gg/Yztdh45vuy"
         />
 
         <Row label="Discord Username" value="redacted21314 (sfv) & REDACTED01234535" />

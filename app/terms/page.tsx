@@ -27,7 +27,7 @@ export default function TermsPage() {
 
       <Card className="p-6 grid gap-6">
         <p className="text-sm text-white/70 leading-relaxed">
-          By accessing this website or purchasing any product or service from Aureon V2
+          By accessing this website or purchasing any product or service from Aureon
           (“we”, “us”, “our”), you agree to the terms below.
         </p>
 
@@ -65,7 +65,7 @@ export default function TermsPage() {
         </Section>
 
         <Section title="7) Limitation of Liability">
-          To the maximum extent permitted by law, Aureon V2 is not liable for indirect
+          To the maximum extent permitted by law, Aureon is not liable for indirect
           or consequential damages related to use of the website or products.
         </Section>
 
