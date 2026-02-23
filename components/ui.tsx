@@ -12,13 +12,16 @@ export function Card({
   return (
     <div
       className={[
-        /* base card */
         "aur-glow relative overflow-hidden rounded-2xl border border-white/10 bg-white/5",
         "shadow-[0_0_0_1px_rgba(255,255,255,0.02)]",
         "transition duration-200",
         className,
       ].join(" ")}
     >
+      {/* visual layers for premium hover */}
+      <div className="aur-inner" />
+      <div className="aur-sheen" />
+
       {children}
     </div>
   );
