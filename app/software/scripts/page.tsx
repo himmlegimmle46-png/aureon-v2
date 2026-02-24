@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Card, Button } from "../../../components/ui";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 type Variant = {
   id: string;
@@ -30,7 +31,7 @@ const MACRO_VARIANTS: Variant[] = [
   {
     id: "Evade Scripts",
     label: "Evade Scripts lifetime",
-    priceLabel: "$100.000",
+    priceLabel: "$100.00",
     priceId: "price_1T3veCISP3QHCCrM9Dj1oxM3",
     inStock: true,
   },
@@ -40,6 +41,10 @@ export default function MacrosPage() {
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Turnstile
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaReady, setCaptchaReady] = useState(false);
+
   async function buy(priceId: string, key: string) {
     setError(null);
     setLoadingKey(key);
@@ -48,7 +53,7 @@ export default function MacrosPage() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ priceId }),
+        body: JSON.stringify({ priceId, captchaToken }),
       });
 
       const data = (await res.json()) as { url?: string; error?: string };
@@ -66,8 +71,8 @@ export default function MacrosPage() {
     <div className="grid gap-6">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Rust Recoil Scripts</h1>
-          <p className="text-sm text-white/60 pt-1">Recoil Scripts</p>
+          <h1 className="text-2xl font-semibold">Macros</h1>
+          <p className="text-sm text-white/60 pt-1">Instant delivery • simple checkout</p>
         </div>
 
         <Link
@@ -88,7 +93,33 @@ export default function MacrosPage() {
         <div className="grid gap-1">
           <div className="text-lg font-semibold">Available options</div>
           <div className="text-sm text-white/60">Choose an option below.</div>
-          <div className="pt-2 text-xs text-white/45">Delivery instructions are shown after checkout, make sure to join the discord to see the immediate stock.</div>
+          <div className="pt-2 text-xs text-white/45">
+            Delivery instructions are shown after checkout.
+          </div>
+        </div>
+
+        {/* Turnstile (one time for the whole page) */}
+        <div className="mt-4">
+          <div className="text-xs text-white/60 pb-2">Verification required to purchase</div>
+          <Turnstile
+            siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+            onSuccess={(token) => {
+              setCaptchaToken(token);
+              setCaptchaReady(true);
+            }}
+            onExpire={() => {
+              setCaptchaToken("");
+              setCaptchaReady(false);
+            }}
+            onError={() => {
+              setCaptchaToken("");
+              setCaptchaReady(false);
+              setError("Captcha failed to load. Please refresh and try again.");
+            }}
+          />
+          {!captchaReady && (
+            <div className="pt-2 text-xs text-white/50">Complete verification to enable purchases.</div>
+          )}
         </div>
 
         <div className="mt-4 grid divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
@@ -112,10 +143,10 @@ export default function MacrosPage() {
 
                 <Button
                   className="shrink-0"
-                  disabled={!v.inStock || isLoading}
+                  disabled={!v.inStock || isLoading || !captchaReady}
                   onClick={() => buy(v.priceId, key)}
                 >
-                  {!v.inStock ? "Sold out" : isLoading ? "Loading…" : "Purchase"}
+                  {!v.inStock ? "Sold out" : isLoading ? "Loading…" : !captchaReady ? "Verify first" : "Purchase"}
                 </Button>
               </div>
             );
@@ -125,9 +156,7 @@ export default function MacrosPage() {
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
             <div className="font-medium text-white/90">What you get</div>
-            <div className="pt-2 text-sm text-white/70">
-              Files + instructions. If you chose setup help, you’ll get the next steps after checkout.
-            </div>
+            <div className="pt-2 text-sm text-white/70">Files + instructions shown after checkout.</div>
           </div>
 
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
@@ -138,9 +167,7 @@ export default function MacrosPage() {
           </div>
         </div>
 
-        <div className="pt-3 text-xs text-white/45">
-          Delivery instructions are shown after checkout.
-        </div>
+        <div className="pt-3 text-xs text-white/45">Delivery instructions are shown after checkout.</div>
       </Card>
     </div>
   );

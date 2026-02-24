@@ -2,7 +2,6 @@ import Stripe from "stripe";
 
 type CheckoutBody = {
   priceId?: string;
-  // Optional: only required if you wired Turnstile on the client already
   captchaToken?: string;
 };
 
@@ -40,8 +39,13 @@ async function verifyTurnstile(token: string) {
     body: `secret=${encodeURIComponent(secret)}&response=${encodeURIComponent(token)}`,
   });
 
-  const data = (await res.json()) as { success?: boolean };
-  return !!data.success;
+  // Turnstile returns JSON like: { success: boolean, ... }
+  const data = (await res.json().catch(() => ({}))) as { success?: boolean; ["error-codes"]?: string[] };
+
+  return {
+    ok: !!data.success,
+    errorCodes: data["error-codes"] ?? [],
+  };
 }
 
 export async function POST(req: Request) {
@@ -56,11 +60,16 @@ export async function POST(req: Request) {
       return Response.json({ error: "Invalid priceId" }, { status: 400 });
     }
 
-    // ✅ Captcha: enforce ONLY if client sends a token.
-    // If you haven't added Turnstile to the client yet, checkout still works.
-    if (body.captchaToken) {
-      const ok = await verifyTurnstile(body.captchaToken);
-      if (!ok) return Response.json({ error: "Captcha failed" }, { status: 400 });
+    // ✅ Captcha REQUIRED
+    const captchaToken = body.captchaToken?.trim();
+    if (!captchaToken) {
+      return Response.json({ error: "Captcha required" }, { status: 400 });
+    }
+
+    const turnstile = await verifyTurnstile(captchaToken);
+    if (!turnstile.ok) {
+      // Keep message simple so you don’t leak details to bots
+      return Response.json({ error: "Captcha failed" }, { status: 400 });
     }
 
     const stripe = getStripe();
