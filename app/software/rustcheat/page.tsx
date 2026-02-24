@@ -41,12 +41,19 @@ export default function ToolKeysPage() {
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Turnstile
-  const [captchaToken, setCaptchaToken] = useState("");
-  const [captchaReady, setCaptchaReady] = useState(false);
+  // Turnstile: token is the only “ready” signal we need
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaReady = !!captchaToken;
 
   async function buy(priceId: string, key: string) {
     setError(null);
+
+    // ✅ Don’t even hit the API without a token
+    if (!captchaToken) {
+      setError("Please complete the captcha first.");
+      return;
+    }
+
     setLoadingKey(key);
 
     try {
@@ -57,7 +64,17 @@ export default function ToolKeysPage() {
       });
 
       const data = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok || !data.url) throw new Error(data.error || "Checkout failed.");
+
+      // ✅ If captcha is invalid/expired, force re-verify
+      if (!res.ok) {
+        const msg = data?.error || "Checkout failed.";
+        if (msg.toLowerCase().includes("captcha")) {
+          setCaptchaToken(null);
+        }
+        throw new Error(msg);
+      }
+
+      if (!data.url) throw new Error("Checkout failed.");
 
       window.location.href = data.url;
     } catch (e: unknown) {
@@ -71,7 +88,7 @@ export default function ToolKeysPage() {
     <div className="grid gap-6">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Rust Cheats</h1>
+          <h1 className="text-2xl font-semibold">Tool Keys</h1>
           <p className="text-sm text-white/60 pt-1">Licenses • instant delivery</p>
         </div>
 
@@ -94,29 +111,29 @@ export default function ToolKeysPage() {
           <div className="text-lg font-semibold">Available options</div>
           <div className="text-sm text-white/60">Choose an option below.</div>
           <div className="pt-2 text-xs text-white/45">
-            Delivery instructions are shown after checkout, make sure to join the discord to see the immediate stock.
+            Delivery instructions are shown after checkout.
           </div>
         </div>
 
         {/* Turnstile (one time for the whole page) */}
         <div className="mt-4">
           <div className="text-xs text-white/60 pb-2">Verification required to purchase</div>
+
           <Turnstile
             siteKey="0x4AAAAAAChGqqGvElmFs8B-"
             onSuccess={(token) => {
               setCaptchaToken(token);
-              setCaptchaReady(true);
+              setError(null);
             }}
             onExpire={() => {
-              setCaptchaToken("");
-              setCaptchaReady(false);
+              setCaptchaToken(null);
             }}
             onError={() => {
-              setCaptchaToken("");
-              setCaptchaReady(false);
-              setError("Captcha failed to load. Please refresh and try again.");
+              setCaptchaToken(null);
+              setError("Captcha failed to load. Disable adblock/shields and refresh.");
             }}
           />
+
           {!captchaReady && (
             <div className="pt-2 text-xs text-white/50">
               Complete verification to enable purchases.
@@ -133,7 +150,9 @@ export default function ToolKeysPage() {
               <div key={v.id} className="flex items-center justify-between gap-4 px-4 py-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <span
-                    className={"h-2.5 w-2.5 rounded-sm " + (v.inStock ? "bg-emerald-400" : "bg-red-400")}
+                    className={
+                      "h-2.5 w-2.5 rounded-sm " + (v.inStock ? "bg-emerald-400" : "bg-red-400")
+                    }
                     aria-hidden
                   />
                   <div className="min-w-0 text-sm text-white/90 truncate">

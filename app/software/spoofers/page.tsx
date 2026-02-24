@@ -42,12 +42,18 @@ export default function OtherSoftwarePage() {
   const [error, setError] = useState<string | null>(null);
 
   // Turnstile
-  const [captchaToken, setCaptchaToken] = useState("");
-  const [captchaReady, setCaptchaReady] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaReady = !!captchaToken
 
   async function buy(priceId: string, key: string) {
-    setError(null);
-    setLoadingKey(key);
+  setError(null);
+
+  if (!captchaToken) {
+    setError("Please complete the captcha first.");
+    return;
+  }
+
+  setLoadingKey(key);
 
     try {
       const res = await fetch("/api/checkout", {
@@ -57,7 +63,17 @@ export default function OtherSoftwarePage() {
       });
 
       const data = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok || !data.url) throw new Error(data.error || "Checkout failed.");
+      if (!res.ok) {
+  const msg = data?.error || "Checkout failed.";
+
+  if (msg.toLowerCase().includes("captcha")) {
+    setCaptchaToken(null);
+  }
+
+  throw new Error(msg);
+}
+
+if (!data.url) throw new Error("Checkout failed.");
 
       window.location.href = data.url;
     } catch (e: unknown) {
@@ -104,18 +120,16 @@ export default function OtherSoftwarePage() {
           <Turnstile
             siteKey="0x4AAAAAAChGqqGvElmFs8B-"
             onSuccess={(token) => {
-              setCaptchaToken(token);
-              setCaptchaReady(true);
-            }}
-            onExpire={() => {
-              setCaptchaToken("");
-              setCaptchaReady(false);
-            }}
-            onError={() => {
-              setCaptchaToken("");
-              setCaptchaReady(false);
-              setError("Captcha failed to load. Please refresh and try again.");
-            }}
+  setCaptchaToken(token);
+  setError(null);
+}}
+onExpire={() => {
+  setCaptchaToken(null);
+}}
+onError={() => {
+  setCaptchaToken(null);
+  setError("Captcha failed to load. Please refresh and try again.");
+}}
           />
           {!captchaReady && (
             <div className="pt-2 text-xs text-white/50">

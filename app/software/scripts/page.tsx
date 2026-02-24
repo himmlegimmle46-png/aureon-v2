@@ -41,12 +41,19 @@ export default function MacrosPage() {
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Turnstile
-  const [captchaToken, setCaptchaToken] = useState("");
-  const [captchaReady, setCaptchaReady] = useState(false);
+  // Turnstile (token = ready)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaReady = !!captchaToken;
 
   async function buy(priceId: string, key: string) {
     setError(null);
+
+    // ✅ Don’t even call the API without a token
+    if (!captchaToken) {
+      setError("Please complete the captcha first.");
+      return;
+    }
+
     setLoadingKey(key);
 
     try {
@@ -57,7 +64,19 @@ export default function MacrosPage() {
       });
 
       const data = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok || !data.url) throw new Error(data.error || "Checkout failed.");
+
+      if (!res.ok) {
+        const msg = data?.error || "Checkout failed.";
+
+        // If captcha failed/expired server-side, force re-verify
+        if (msg.toLowerCase().includes("captcha")) {
+          setCaptchaToken(null);
+        }
+
+        throw new Error(msg);
+      }
+
+      if (!data.url) throw new Error("Checkout failed.");
 
       window.location.href = data.url;
     } catch (e: unknown) {
@@ -93,9 +112,7 @@ export default function MacrosPage() {
         <div className="grid gap-1">
           <div className="text-lg font-semibold">Available options</div>
           <div className="text-sm text-white/60">Choose an option below.</div>
-          <div className="pt-2 text-xs text-white/45">
-            Delivery instructions are shown after checkout.
-          </div>
+          <div className="pt-2 text-xs text-white/45">Delivery instructions are shown after checkout.</div>
         </div>
 
         {/* Turnstile (one time for the whole page) */}
@@ -105,15 +122,13 @@ export default function MacrosPage() {
             siteKey="0x4AAAAAAChGqqGvElmFs8B-"
             onSuccess={(token) => {
               setCaptchaToken(token);
-              setCaptchaReady(true);
+              setError(null);
             }}
             onExpire={() => {
-              setCaptchaToken("");
-              setCaptchaReady(false);
+              setCaptchaToken(null);
             }}
             onError={() => {
-              setCaptchaToken("");
-              setCaptchaReady(false);
+              setCaptchaToken(null);
               setError("Captcha failed to load. Please refresh and try again.");
             }}
           />

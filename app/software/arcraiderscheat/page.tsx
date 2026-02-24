@@ -42,11 +42,18 @@ export default function AddonsPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Turnstile
-  const [captchaToken, setCaptchaToken] = useState("");
-  const [captchaReady, setCaptchaReady] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaReady = !!captchaToken;
 
   async function buy(priceId: string, key: string) {
     setError(null);
+
+    // ✅ Don’t hit the API without a token
+    if (!captchaToken) {
+      setError("Please complete the captcha first.");
+      return;
+    }
+
     setLoadingKey(key);
 
     try {
@@ -57,7 +64,17 @@ export default function AddonsPage() {
       });
 
       const data = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok || !data.url) throw new Error(data.error || "Checkout failed.");
+
+      // If server says captcha failed/required, force re-verify
+      if (!res.ok) {
+        const msg = data?.error || "Checkout failed.";
+        if (msg.toLowerCase().includes("captcha")) {
+          setCaptchaToken(null);
+        }
+        throw new Error(msg);
+      }
+
+      if (!data.url) throw new Error("Checkout failed.");
 
       window.location.href = data.url;
     } catch (e: unknown) {
@@ -71,7 +88,7 @@ export default function AddonsPage() {
     <div className="grid gap-6">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Arc Raiders Cheat</h1>
+          <h1 className="text-2xl font-semibold">Product</h1>
           <p className="text-sm text-white/60 pt-1">Instant delivery • simple checkout</p>
         </div>
 
@@ -94,29 +111,29 @@ export default function AddonsPage() {
           <div className="text-lg font-semibold">Available options</div>
           <div className="text-sm text-white/60">Choose an option below.</div>
           <div className="pt-2 text-xs text-white/45">
-            Delivery instructions are shown after checkout, make sure to join the discord to see the immediate stock.
+            Delivery instructions are shown after checkout.
           </div>
         </div>
 
         {/* Turnstile (one time for the whole page) */}
         <div className="mt-4">
           <div className="text-xs text-white/60 pb-2">Verification required to purchase</div>
+
           <Turnstile
             siteKey="0x4AAAAAAChGqqGvElmFs8B-"
             onSuccess={(token) => {
               setCaptchaToken(token);
-              setCaptchaReady(true);
+              setError(null);
             }}
             onExpire={() => {
-              setCaptchaToken("");
-              setCaptchaReady(false);
+              setCaptchaToken(null);
             }}
             onError={() => {
-              setCaptchaToken("");
-              setCaptchaReady(false);
+              setCaptchaToken(null);
               setError("Captcha failed to load. Please refresh and try again.");
             }}
           />
+
           {!captchaReady && (
             <div className="pt-2 text-xs text-white/50">
               Complete verification to enable purchases.
@@ -165,7 +182,7 @@ export default function AddonsPage() {
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
             <div className="font-medium text-white/90">What you get</div>
             <div className="pt-2 text-sm text-white/70">
-              Your add-on details and next steps will be shown after checkout.
+              Details and next steps will be shown after checkout.
             </div>
           </div>
 
