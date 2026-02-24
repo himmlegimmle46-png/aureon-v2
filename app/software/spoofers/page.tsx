@@ -118,19 +118,29 @@ if (!data.url) throw new Error("Checkout failed.");
         <div className="mt-4">
           <div className="text-xs text-white/60 pb-2">Verification required to purchase</div>
           <Turnstile
-            siteKey="0x4AAAAAAChGqqGvElmFs8B-"
-            onSuccess={(token) => {
-  setCaptchaToken(token);
-  setError(null);
-}}
-onExpire={() => {
-  setCaptchaToken(null);
-}}
-onError={() => {
-  setCaptchaToken(null);
-  setError("Captcha failed to load. Please refresh and try again.");
-}}
-          />
+  siteKey="0x4AAAAAAChGqqGvElmFs8B-"
+  onSuccess={(token) => {
+    setCaptchaToken(token);
+    setError(null);
+  }}
+  onExpire={() => setCaptchaToken(null)}
+  onError={() => {
+    setCaptchaToken(null);
+    setError("Captcha failed to load. Please refresh and try again.");
+  }}
+/>
+
+{/* ✅ DEBUG: should flip to YES after captcha */}
+<div className="pt-2 text-xs text-white/50">
+  token: {captchaToken ? "YES" : "NO"} • length: {captchaToken?.length ?? 0}
+</div>
+
+{!captchaReady && (
+  <div className="pt-2 text-xs text-white/50">
+    Complete verification to enable purchases.
+  </div>
+)}
+
           {!captchaReady && (
             <div className="pt-2 text-xs text-white/50">
               Complete verification to enable purchases.

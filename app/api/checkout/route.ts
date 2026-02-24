@@ -61,16 +61,18 @@ export async function POST(req: Request) {
     }
 
     // ✅ Captcha REQUIRED
-    const captchaToken = body.captchaToken?.trim();
-    if (!captchaToken) {
-      return Response.json({ error: "Captcha required" }, { status: 400 });
-    }
+const captchaToken = body.captchaToken?.trim();
+if (!captchaToken) {
+  return Response.json(
+    { error: "Captcha required", debug: { hasToken: !!body.captchaToken, tokenLen: body.captchaToken?.length ?? 0 } },
+    { status: 400 }
+  );
+}
 
-    const turnstile = await verifyTurnstile(captchaToken);
-    if (!turnstile.ok) {
-      // Keep message simple so you don’t leak details to bots
-      return Response.json({ error: "Captcha failed" }, { status: 400 });
-    }
+const turnstile = await verifyTurnstile(captchaToken);
+if (!turnstile.ok) {
+  return Response.json({ error: "Captcha failed" }, { status: 400 });
+}
 
     const stripe = getStripe();
 
