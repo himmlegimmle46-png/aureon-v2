@@ -102,7 +102,7 @@ export default function MacrosPage() {
         <div className="mt-4">
           <div className="text-xs text-white/60 pb-2">Verification required to purchase</div>
           <Turnstile
-            siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+            siteKey="0x4AAAAAAChGqqGvElmFs8B-"
             onSuccess={(token) => {
               setCaptchaToken(token);
               setCaptchaReady(true);
