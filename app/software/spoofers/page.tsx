@@ -87,7 +87,7 @@ if (!data.url) throw new Error("Checkout failed.");
     <div className="grid gap-6">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Other Software</h1>
+          <h1 className="text-2xl font-semibold">HWID Spoofer</h1>
           <p className="text-sm text-white/60 pt-1">Instant delivery</p>
         </div>
 

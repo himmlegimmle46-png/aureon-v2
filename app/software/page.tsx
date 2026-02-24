@@ -7,33 +7,33 @@ export default function SoftwareHubPage() {
     {
       href: "/software/rustcheat",
       title: "Rust Cheats",
-      desc: "Keys, licenses, and access options",
-      meta: "Instant delivery • multiple options",
+      desc: "Serenity Cheat – Aimbot, ESP, no recoil & spread control",
+      meta: "Undetectable external • Instant delivery • Lifetime option",
     },
     {
       href: "/software/scripts",
       title: "Rust Recoil Scripts",
-      desc: "Rust Scripts",
-      meta: "Windows • setup guide included",
+      desc: "Evade Recoil Script – Perfect control, humanized patterns",
+      meta: "Auto weapon detect • Legit feel • Instant download + setup guide",
     },
     {
       href: "/software/spoofers",
       title: "Spoofers",
-      desc: "Spoofing / bypass software",
-      meta: "Popular options • instant delivery",
+      desc: "Exception HWID Spoofer – Full hardware bypass (disk, GPU, motherboard, network)",
+      meta: "Works with major anti-cheats • Instant delivery • Easy activation",
     },
     {
       href: "/software/arcraiderscheat",
       title: "Arc Raiders Cheat",
-      desc: "Arc Raiders Cheats",
-      meta: "Instant delivery • simple checkout",
+      desc: "Serenity Cheat – Aimbot & skeleton ESP",
+      meta: "Undetectable • Instant delivery • Simple checkout",
     },
   ] as const;
 
   return (
     <div className="grid gap-6">
       <div>
-        <h1 className="text-2xl font-semibold">Software’s</h1>
+        <h1 className="text-2xl font-semibold">Cheats & Spoofers</h1>
         <p className="text-sm text-white/60 pt-1">
           Choose a category to view available software listings. Join the discord to see the immediate stock updates and new releases.
         </p>

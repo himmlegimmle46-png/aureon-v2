@@ -88,7 +88,7 @@ export default function AddonsPage() {
     <div className="grid gap-6">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Product</h1>
+          <h1 className="text-2xl font-semibold">Arc Raiders Cheat</h1>
           <p className="text-sm text-white/60 pt-1">Instant delivery • simple checkout</p>
         </div>
 
