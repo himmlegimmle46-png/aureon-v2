@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export const runtime = "nodejs";
-
+// NOTE: Cloudflare Pages adapter types expect params to be a Promise.
 export async function GET(
-  _req: Request,
-  context: { params: { sku: string } }
+  _req: NextRequest,
+  { params }: { params: Promise<{ sku: string }> }
 ) {
-  const sku = context.params.sku;
+  const { sku } = await params;
 
   const product = await prisma.product.findUnique({ where: { sku } });
   if (!product) return NextResponse.json({ sku, remaining: 0 });
