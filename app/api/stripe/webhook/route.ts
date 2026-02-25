@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
-import { skuFromPriceId } from "@/lib/products";
 import { Resend } from "resend";
 
 export const runtime = "nodejs";
@@ -37,7 +36,6 @@ export async function POST(req: Request) {
 
   const session = event.data.object as Stripe.Checkout.Session;
 
-  // Only fulfill paid sessions
   if (session.payment_status !== "paid") {
     return NextResponse.json({ received: true });
   }
@@ -61,7 +59,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ delivered: true });
   }
 
-  // Determine what was purchased
+  // Determine what was purchased (assumes 1 item checkout)
   const lineItems = await stripe.checkout.sessions.listLineItems(sessionId, {
     limit: 10,
   });
@@ -71,16 +69,41 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "No priceId found" }, { status: 400 });
   }
 
-  const sku = skuFromPriceId(priceId);
-  if (!sku) {
-    return NextResponse.json({ error: "Unknown priceId mapping" }, { status: 400 });
-  }
+  // Fetch the Stripe Price and expand its Product so we can read Product metadata.sku
+  const price = await stripe.prices.retrieve(priceId, { expand: ["product"] });
 
-  // Ensure product exists
+  const stripeProduct = price.product;
+if (!stripeProduct || typeof stripeProduct === "string") {
+  return NextResponse.json(
+    { error: "Missing expanded Stripe product" },
+    { status: 400 }
+  );
+}
+
+// ✅ Narrow Product vs DeletedProduct
+if ("deleted" in stripeProduct && stripeProduct.deleted) {
+  return NextResponse.json(
+    { error: "Stripe product is deleted" },
+    { status: 400 }
+  );
+}
+
+// Now TS knows it's a real Stripe.Product
+const sku = stripeProduct.metadata?.sku?.trim();
+if (!sku) {
+  return NextResponse.json(
+    { error: "Missing Product metadata: sku" },
+    { status: 400 }
+  );
+}
+
+const productName = stripeProduct.name?.trim() || sku;
+
+  // Ensure product exists in our DB
   const product = await prisma.product.upsert({
     where: { sku },
-    update: {},
-    create: { sku, name: sku },
+    update: { name: productName },
+    create: { sku, name: productName },
   });
 
   // Claim stock + create delivery atomically
@@ -129,7 +152,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Fulfillment failed" }, { status: 500 });
   }
 
-  // Email the key (recommended)
+  // Email the key (optional but recommended)
   const resendKey = process.env.RESEND_API_KEY;
   const from = process.env.FULFILL_FROM_EMAIL;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
