@@ -41,7 +41,7 @@ export default function ContactPage() {
 
       <Card className="p-6 grid gap-2">
         {/* EDIT THESE VALUES */}
-        <Row label="Email" value="himmlegimmle46@gmail.com" href="mailto:himmlegimmle46@gmail.com" />
+        <Row label="Email" value="REDACTED@aureon-collective.xyz" href="mailto:REDACTED@aureon-collective.xyz" />
 
         <Row
           label="Discord Server"

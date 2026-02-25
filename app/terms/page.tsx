@@ -1,25 +1,10 @@
 import { Card } from "../../components/ui";
 
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="grid gap-2">
-      <h2 className="text-base font-semibold text-white">{title}</h2>
-      <div className="text-sm text-white/70 leading-relaxed">{children}</div>
-    </div>
-  );
-}
-
 export default function TermsPage() {
   const lastUpdated = "Feb 21, 2026"; // change whenever you update terms
 
   return (
-    <div className="grid gap-5">
+    <div className="mx-auto w-full max-w-5xl grid gap-6">
       <div>
         <h1 className="text-2xl font-semibold">Terms of Service</h1>
         <p className="text-sm text-white/60 pt-1">Last updated: {lastUpdated}</p>
@@ -27,56 +12,61 @@ export default function TermsPage() {
 
       <Card className="p-6 grid gap-6">
         <p className="text-sm text-white/70 leading-relaxed">
-          By accessing this website or purchasing any product or service from Aureon
-          (“we”, “us”, “our”), you agree to the terms below.
+          By accessing this website or purchasing any product or service from Aureon (“Aureon”, “we”, “us”),
+          you agree to these Terms of Service (“Terms”). If you do not agree, do not use the site.
         </p>
 
-        <Section title="1) Digital Products">
-          All items sold are digital goods or digital services. Delivery timelines can
-          vary depending on availability and verification steps.
-        </Section>
+        <div className="grid gap-2">
+          <h2 className="text-base font-semibold text-white">1. Eligibility</h2>
+          <p className="text-sm text-white/70 leading-relaxed">
+            You must be able to form a legally binding agreement in your jurisdiction to use this website.
+          </p>
+        </div>
 
-        <Section title="2) Payments">
-          Payments are processed through third-party providers (e.g., Stripe). We do not
-          store full payment card details on our servers.
-        </Section>
+        <div className="grid gap-2">
+          <h2 className="text-base font-semibold text-white">2. Orders & Delivery</h2>
+          <p className="text-sm text-white/70 leading-relaxed">
+            After checkout, delivery instructions will be shown on-screen and/or provided via the contact
+            method you supply. You are responsible for providing accurate information.
+          </p>
+        </div>
 
-        <Section title="3) Refunds">
-          Because digital goods can’t be “returned”, purchases are generally final once
-          delivery has started, except where required by law. If you have an issue,
-          contact support first and we’ll try to resolve it.
-        </Section>
+        <div className="grid gap-2">
+          <h2 className="text-base font-semibold text-white">3. Refunds</h2>
+          <p className="text-sm text-white/70 leading-relaxed">
+            Refund eligibility depends on the product/service and whether delivery has occurred. If you
+            believe there is an issue with your order, contact support as soon as possible.
+          </p>
+        </div>
 
-        <Section title="4) Chargebacks & Disputes">
-          Don’t chargeback as a first step. If you open a dispute without contacting
-          us, we may refuse future service. Fraudulent disputes may result in a ban
-          from future purchases.
-        </Section>
+        <div className="grid gap-2">
+          <h2 className="text-base font-semibold text-white">4. Prohibited Use</h2>
+          <p className="text-sm text-white/70 leading-relaxed">
+            You agree not to misuse the website, attempt unauthorized access, disrupt the service, or use
+            the site for unlawful activity.
+          </p>
+        </div>
 
-        <Section title="5) User Responsibilities">
-          You are responsible for keeping your accounts secure and complying with any
-          relevant platform rules and laws. We are not responsible for consequences of
-          misuse or rule violations.
-        </Section>
+        <div className="grid gap-2">
+          <h2 className="text-base font-semibold text-white">5. Limitation of Liability</h2>
+          <p className="text-sm text-white/70 leading-relaxed">
+            To the maximum extent permitted by law, Aureon is not liable for indirect, incidental, special,
+            consequential, or punitive damages, or any loss of profits or revenue.
+          </p>
+        </div>
 
-        <Section title="6) Availability & Errors">
-          Product availability, pricing, and descriptions may change. If an order is
-          affected by an error or stock issue, we may cancel and refund it.
-        </Section>
+        <div className="grid gap-2">
+          <h2 className="text-base font-semibold text-white">6. Changes</h2>
+          <p className="text-sm text-white/70 leading-relaxed">
+            We may update these Terms from time to time. Continued use of the site after changes means you
+            accept the updated Terms.
+          </p>
+        </div>
 
-        <Section title="7) Limitation of Liability">
-          To the maximum extent permitted by law, Aureon is not liable for indirect
-          or consequential damages related to use of the website or products.
-        </Section>
-
-        <Section title="8) Changes">
-          We may update these terms at any time. Continued use of the site after updates
-          means you accept the new terms.
-        </Section>
-
-        <div className="pt-2 border-t border-white/10">
-          <p className="text-sm text-white/70 pt-4">
-            Support: use the official support contact listed on this website.
+        <div className="grid gap-2">
+          <h2 className="text-base font-semibold text-white">7. Contact</h2>
+          <p className="text-sm text-white/70 leading-relaxed">
+            For questions about these Terms or an order, use the Contact page.
           </p>
         </div>
       </Card>

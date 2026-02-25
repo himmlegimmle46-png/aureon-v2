@@ -31,6 +31,24 @@ body {
     #000;
 }
 
+/* NEW: Slow drift layer (premium motion, minimal) */
+.ac-drift {
+  position: absolute;
+  inset: -50%;
+  background:
+    radial-gradient(60% 40% at 30% 60%, rgba(140,90,255,0.12), transparent 70%),
+    radial-gradient(60% 40% at 70% 40%, rgba(90,220,255,0.10), transparent 70%);
+  filter: blur(40px);
+  opacity: 0.9;
+  animation: driftMove 22s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes driftMove {
+  0% { transform: translate3d(-60px, 20px, 0) scale(1.05); }
+  100% { transform: translate3d(80px, -40px, 0) scale(1.10); }
+}
+
 /* Accent text utility */
 .ac-text-accent {
   background: linear-gradient(90deg, rgba(140,200,255,1), rgba(190,140,255,1), rgba(120,240,255,1));
@@ -66,7 +84,7 @@ body {
     0 0 30px rgba(190,140,255,0.12);
 }
 
-/* Extra background “wow”: rotating ring + shooting stars */
+/* Extra background “wow”: rotating ring */
 .ac-ring {
   position: absolute;
   inset: -35%;
@@ -81,41 +99,6 @@ body {
 @keyframes ring-spin {
   from { transform: rotate(0deg) scale(1.05); }
   to   { transform: rotate(360deg) scale(1.05); }
-}
-
-/* Shooting stars layer */
-.ac-shooting {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-.ac-shooting::before,
-.ac-shooting::after {
-  content: "";
-  position: absolute;
-  top: 18%;
-  left: -30%;
-  width: 45%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.75), transparent);
-  filter: blur(0.2px);
-  opacity: 0;
-  transform: rotate(-12deg);
-  animation: shoot 6.8s ease-in-out infinite;
-}
-.ac-shooting::after {
-  top: 62%;
-  width: 55%;
-  animation-delay: 3.1s;
-  transform: rotate(-9deg);
-}
-
-@keyframes shoot {
-  0%   { transform: translate3d(0,0,0) rotate(-12deg); opacity: 0; }
-  10%  { opacity: 0.55; }
-  35%  { opacity: 0.0; }
-  100% { transform: translate3d(240%, 40%, 0) rotate(-12deg); opacity: 0; }
 }
 
 /* Make aurora more noticeable */
@@ -147,74 +130,6 @@ body {
   100% { transform: translate3d(55px, -26px, 0) scale(1.08); }
 }
 
-/* Starfield layers */
-.ac-stars,
-.ac-stars2,
-.ac-stars3 {
-  position: absolute;
-  inset: -25%;
-  background-repeat: repeat;
-  will-change: transform, opacity;
-  pointer-events: none;
-}
-
-.ac-stars {
-  opacity: 0.28;
-  background-size: 520px 520px;
-  background-image:
-    radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,0.95) 55%, transparent 60%),
-    radial-gradient(1px 1px at 28% 76%, rgba(255,255,255,0.80) 55%, transparent 60%),
-    radial-gradient(1px 1px at 52% 42%, rgba(255,255,255,0.85) 55%, transparent 60%),
-    radial-gradient(1px 1px at 70% 16%, rgba(255,255,255,0.70) 55%, transparent 60%),
-    radial-gradient(1px 1px at 86% 64%, rgba(255,255,255,0.88) 55%, transparent 60%),
-    radial-gradient(1px 1px at 16% 54%, rgba(255,255,255,0.70) 55%, transparent 60%),
-    radial-gradient(1px 1px at 44% 10%, rgba(255,255,255,0.75) 55%, transparent 60%),
-    radial-gradient(1px 1px at 94% 36%, rgba(255,255,255,0.85) 55%, transparent 60%);
-  animation: stars-float 75s linear infinite, stars-twinkle 6s ease-in-out infinite;
-}
-
-.ac-stars2 {
-  opacity: 0.16;
-  background-size: 820px 820px;
-  background-image:
-    radial-gradient(1px 1px at 18% 22%, rgba(255,255,255,0.70) 55%, transparent 60%),
-    radial-gradient(1px 1px at 32% 68%, rgba(255,255,255,0.62) 55%, transparent 60%),
-    radial-gradient(1px 1px at 62% 46%, rgba(255,255,255,0.58) 55%, transparent 60%),
-    radial-gradient(1px 1px at 78% 22%, rgba(255,255,255,0.58) 55%, transparent 60%),
-    radial-gradient(1px 1px at 90% 72%, rgba(255,255,255,0.62) 55%, transparent 60%);
-  animation: stars-float2 110s linear infinite, stars-twinkle 8s ease-in-out infinite;
-}
-
-.ac-stars3 {
-  opacity: 0.10;
-  background-size: 1100px 1100px;
-  background-image:
-    radial-gradient(1px 1px at 22% 40%, rgba(255,255,255,0.55) 55%, transparent 60%),
-    radial-gradient(1px 1px at 58% 22%, rgba(255,255,255,0.50) 55%, transparent 60%),
-    radial-gradient(1px 1px at 82% 52%, rgba(255,255,255,0.52) 55%, transparent 60%);
-  animation: stars-float3 150s linear infinite;
-}
-
-@keyframes stars-float {
-  0%   { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(-180px, -115px, 0); }
-}
-
-@keyframes stars-float2 {
-  0%   { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(140px, -90px, 0); }
-}
-
-@keyframes stars-float3 {
-  0%   { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(-80px, 120px, 0); }
-}
-
-@keyframes stars-twinkle {
-  0%, 100% { opacity: 0.18; }
-  50%      { opacity: 0.32; }
-}
-
 /* Aurora sweep */
 .ac-aurora {
   position: absolute;
@@ -242,7 +157,7 @@ body {
   box-shadow: 0 12px 50px rgba(0,0,0,0.45);
 }
 
-/* Subtle film grain (optional but makes it look expensive) */
+/* Subtle film grain */
 .ac-grain {
   position: absolute;
   inset: 0;
@@ -270,80 +185,6 @@ body {
   position: absolute;
   inset: 0;
   background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.86) 100%);
-}
-
-/* ================================
-   Intro Overlay Animation
-================================ */
-
-.ac-intro {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  display: grid;
-  place-items: center;
-  background:
-    radial-gradient(1200px 900px at 50% 40%, rgba(140, 190, 255, 0.10), transparent 55%),
-    radial-gradient(900px 700px at 65% 55%, rgba(190, 130, 255, 0.10), transparent 60%),
-    rgba(0, 0, 0, 0.92);
-  backdrop-filter: blur(10px);
-  animation: intro-fadeout 1.7s ease forwards;
-}
-
-@keyframes intro-fadeout {
-  0%   { opacity: 1; }
-  78%  { opacity: 1; }
-  100% { opacity: 0; visibility: hidden; }
-}
-
-.ac-intro-inner {
-  text-align: center;
-  transform: translate3d(0, 10px, 0);
-  opacity: 0;
-  animation: intro-in 0.65s ease forwards;
-}
-
-@keyframes intro-in {
-  0%   { opacity: 0; transform: translate3d(0, 16px, 0) scale(0.98); }
-  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
-}
-
-.ac-intro-title {
-  font-size: clamp(40px, 6vw, 74px);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
-}
-
-.ac-intro-glow {
-  color: rgba(255,255,255,0.95);
-  text-shadow:
-    0 0 16px rgba(120, 200, 255, 0.35),
-    0 0 34px rgba(170, 120, 255, 0.25),
-    0 0 60px rgba(80, 240, 255, 0.18);
-}
-
-.ac-intro-v2 {
-  color: rgba(255,255,255,0.55);
-  text-shadow:
-    0 0 18px rgba(255, 255, 255, 0.18);
-}
-
-.ac-intro-sub {
-  margin-top: 10px;
-  font-size: 14px;
-  color: rgba(255,255,255,0.55);
-}
-
-/* Optional: page content “reveal” feel */
-.ac-page {
-  animation: page-in 0.55s ease both;
-  animation-delay: 0.15s;
-}
-
-@keyframes page-in {
-  0%   { opacity: 0; transform: translate3d(0, 10px, 0); }
-  100% { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 /* =========================================
@@ -377,13 +218,12 @@ body {
   will-change: transform;
 }
 
-/* Animated gradient border ring */
 .aur-glow::before {
   content: "";
   position: absolute;
-  inset: -2px;                 /* border thickness */
+  inset: -2px;
   border-radius: inherit;
-  padding: 2px;                /* must match inset thickness */
+  padding: 2px;
   background: linear-gradient(
     90deg,
     rgba(90, 220, 255, 0.95),
@@ -395,8 +235,6 @@ body {
   opacity: 0;
   z-index: -1;
   animation: aurBorderFlow 7s ease-in-out infinite;
-
-  /* punch the center out so it's only a ring */
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
@@ -404,7 +242,6 @@ body {
           mask-composite: exclude;
 }
 
-/* Big soft glow behind (this is the “nice” part) */
 .aur-glow::after {
   content: "";
   position: absolute;
@@ -419,7 +256,6 @@ body {
   z-index: -2;
 }
 
-/* Aurora “sheen ribbon” sweeping across the surface */
 .aur-glow > .aur-sheen {
   pointer-events: none;
   position: absolute;
@@ -448,7 +284,6 @@ body {
   animation: aurSheenSweep 2.4s ease-in-out infinite;
 }
 
-/* Tiny inner highlight so edges look premium */
 .aur-glow > .aur-inner {
   pointer-events: none;
   position: absolute;
@@ -462,35 +297,26 @@ body {
     0 0 0 1px rgba(255,255,255,0.02);
 }
 
-/* Hover state */
 .aur-glow:hover {
   transform: translateY(-1px);
   filter: brightness(1.06);
 }
 
-.aur-glow:hover::before {
-  opacity: 1;
-}
+.aur-glow:hover::before { opacity: 1; }
+.aur-glow:hover::after  { opacity: 1; animation: aurGlowBreath 2.8s ease-in-out infinite; }
+.aur-glow:hover > .aur-sheen { opacity: 1; }
+.aur-glow:hover > .aur-sheen::before { opacity: 1; }
+.aur-glow:hover > .aur-inner { opacity: 1; }
 
-.aur-glow:hover::after {
-  opacity: 1;
-  animation: aurGlowBreath 2.8s ease-in-out infinite;
-}
-
-.aur-glow:hover > .aur-sheen {
-  opacity: 1;
-}
-
-.aur-glow:hover > .aur-sheen::before {
-  opacity: 1;
-}
-
-.aur-glow:hover > .aur-inner {
-  opacity: 1;
-}
-
-/* keyboard focus too */
 .aur-glow:focus-visible::before,
 .aur-glow:focus-visible::after {
   opacity: 1;
+}
+
+/* SAFETY: hard-disable any old sparkle layers if they exist anywhere */
+.ac-stars,
+.ac-stars2,
+.ac-stars3,
+.ac-shooting {
+  display: none !important;
 }

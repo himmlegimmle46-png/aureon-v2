@@ -15,21 +15,21 @@ type Variant = {
 
 const MACRO_VARIANTS: Variant[] = [
   {
-    id: "Evade Scripts",
+    id: "Evade Scripts 30",
     label: "Evade Scripts 30 days",
     priceLabel: "$25.00",
     priceId: "price_1T3vdNISP3QHCCrMxL6U5ByH",
     inStock: true,
   },
   {
-    id: "Evade Scripts",
+    id: "Evade Scripts 90",
     label: "Evade Scripts 90 days",
     priceLabel: "$50.00",
     priceId: "price_1T3vdnISP3QHCCrMWQMTjRk0",
     inStock: true,
   },
   {
-    id: "Evade Scripts",
+    id: "Evade Scripts lifetime",
     label: "Evade Scripts lifetime",
     priceLabel: "$100.00",
     priceId: "price_1T3veCISP3QHCCrM9Dj1oxM3",

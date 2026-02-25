@@ -15,26 +15,26 @@ export default function IntroOverlay() {
     <div
       aria-hidden
       className={[
-        "fixed inset-0 z-[80] grid place-items-center transition-opacity duration-500",
+        "fixed inset-0 z-[80] flex items-center justify-center transition-opacity duration-500",
         show ? "opacity-100" : "opacity-0 pointer-events-none",
       ].join(" ")}
     >
-      {/* dark glass */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
 
-      {/* glow */}
-      <div className="absolute h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,rgba(140,90,255,0.22),transparent_60%)] blur-2xl" />
-      <div className="absolute h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,rgba(80,200,255,0.14),transparent_60%)] blur-2xl" />
+      <div className="absolute h-[560px] w-[560px] rounded-full bg-[radial-gradient(circle,rgba(140,90,255,0.22),transparent_60%)] blur-2xl" />
+      <div className="absolute h-[560px] w-[560px] rounded-full bg-[radial-gradient(circle,rgba(80,200,255,0.14),transparent_60%)] blur-2xl" />
 
-      {/* logo */}
-      <div className="relative">
+      <div className="relative flex items-center justify-center">
         <Image
           src="/ac-logo.png"
-          alt="Aureon"
-          width={220}
-          height={220}
+          alt="AC"
+          width={300}
+          height={300}
           priority
-          className={show ? "animate-[introPop_700ms_cubic-bezier(.2,.8,.2,1)_forwards]" : ""}
+          className={[
+            "select-none pointer-events-none drop-shadow-[0_0_40px_rgba(140,90,255,0.35)]",
+            show ? "animate-[introPop_700ms_cubic-bezier(.2,.8,.2,1)_forwards]" : "",
+          ].join(" ")}
         />
       </div>
 

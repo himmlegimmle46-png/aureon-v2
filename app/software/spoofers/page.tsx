@@ -15,21 +15,21 @@ type Variant = {
 
 const OTHER_SOFTWARE_VARIANTS: Variant[] = [
   {
-    id: "Exception Spoofer",
+    id: "Exception Spoofer 1",
     label: "Exception Spoofer 1 day",
     priceLabel: "$5.00",
     priceId: "price_1T3vegISP3QHCCrM51PKxVzz",
     inStock: true,
   },
   {
-    id: "Exception Spoofer",
+    id: "Exception Spoofer 7",
     label: "Exception Spoofer 7 days",
     priceLabel: "$12.00",
     priceId: "price_1T3vezISP3QHCCrMI6dMjXDn",
     inStock: true,
   },
   {
-    id: "Exception Spoofer",
+    id: "Exception Spoofer 30",
     label: "Exception Spoofer 30 days",
     priceLabel: "$22.00",
     priceId: "price_1T3vfLISP3QHCCrMju6wy42g",
