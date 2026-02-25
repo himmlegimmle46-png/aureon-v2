@@ -2,31 +2,30 @@ import Link from "next/link";
 import { Card } from "../../components/ui";
 
 export default function ProductsPage() {
-  // Edit these anytime
   const ITEMS = [
     {
       href: "/accounts",
-      title: "Accounts",
-      desc: "Browse available account listings and checkout.",
-      meta: "Rust NFA accounts",
+      title: "Steam NFA Accounts",
+      desc: "Browse available account listings, join the discord for FA accounts",
+      meta: "Just Rust NFA accounts for now, more coming soon",
     },
     {
-      href: "/software/rustcheat",
+      href: "/products/rust",
       title: "Rust",
-      desc: "Rust Cheats & Scripts.",
-      meta: "View listings • Details on page",
+      desc: "Rust Cheats",
+      meta: "Cheats + Scripts",
     },
     {
       href: "/software/arcraiderscheat",
       title: "Arc Raiders",
-      desc: "Arc Raiders Cheats.",
-      meta: "View listings • Details on page",
+      desc: "Arc Raiders Cheats",
+      meta: "Cheats",
     },
     {
       href: "/software/spoofers",
       title: "HWID Spoofer",
-      desc: "HWID spoofer.",
-      meta: "View listings • Details on page",
+      desc: "HWID spoofer to evade bans",
+      meta: "Spoofers",
     },
   ] as const;
 
