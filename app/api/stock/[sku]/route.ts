@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// NOTE: Cloudflare Pages adapter types expect params to be a Promise.
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ sku: string }> }
