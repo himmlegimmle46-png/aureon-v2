@@ -19,31 +19,10 @@ const TURNSTILE_SITE_KEY =
 
 const RUST_VARIANTS: Variant[] = [
   {
-    id: "0-100",
-    label: "Rust account with 0–100 hours",
+    id: "0-1500",
+    label: "Rust  NFA accounts with 0–1500 hours",
     priceLabel: "$2.00",
     priceId: "price_1T3wS5ISP3QHCCrM9Mhuiwau",
-    inStock: true,
-  },
-  {
-    id: "100-500",
-    label: "Rust account with 100–500 hours",
-    priceLabel: "$2.25",
-    priceId: "price_1T3wSMISP3QHCCrMAul3oNVM",
-    inStock: true,
-  },
-  {
-    id: "500-1000",
-    label: "Rust account with 500–1000 hours",
-    priceLabel: "$2.50",
-    priceId: "price_1T3wSgISP3QHCCrMZTDBRBm4",
-    inStock: true,
-  },
-  {
-    id: "1000-1500",
-    label: "Rust account with 1000–1500 hours",
-    priceLabel: "$2.75",
-    priceId: "price_1T3wSxISP3QHCCrMuQzCQrN6",
     inStock: true,
   },
 ];
