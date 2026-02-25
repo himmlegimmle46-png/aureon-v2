@@ -1,19 +1,50 @@
-import { Button, Card } from "../../../components/ui";
+import { prisma } from "@/lib/prisma";
 
-export default function SuccessPage() {
+export default async function SuccessPage({
+  searchParams,
+}: {
+  searchParams: { session_id?: string };
+}) {
+  const sessionId = searchParams.session_id;
+
+  if (!sessionId) {
+    return (
+      <div className="max-w-2xl mx-auto p-6">
+        <h1 className="text-2xl font-semibold">Success</h1>
+        <p className="text-white/70 mt-2">Missing session id.</p>
+      </div>
+    );
+  }
+
+  const delivery = await prisma.delivery.findUnique({
+    where: { sessionId },
+    include: { product: true },
+  });
+
   return (
-    <div className="grid place-items-center">
-      <Card className="p-6 max-w-md w-full text-center">
-        <h1 className="text-xl font-semibold">Payment successful ✅</h1>
-        <p className="text-sm text-white/60 pt-2">
-          If this were live, you’d now show instructions (Discord ticket, delivery steps, etc).
-        </p>
+    <div className="max-w-2xl mx-auto p-6 grid gap-4">
+      <h1 className="text-2xl font-semibold">Payment successful</h1>
 
-        <div className="pt-5 flex justify-center gap-3">
-          <Button href="/accounts">Back to Accounts</Button>
-          <Button href="/" variant="ghost">Home</Button>
+      {!delivery ? (
+        <p className="text-white/70">
+          We’re processing your order. If you don’t see your key in a minute, check your email.
+        </p>
+      ) : (
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-5 grid gap-3">
+          <div className="text-white/70 text-sm">
+            Product: <span className="text-white">{delivery.product.name}</span>
+          </div>
+
+          <div className="text-white/70 text-sm">Your key:</div>
+          <pre className="whitespace-pre-wrap break-words rounded-xl bg-black/50 p-4 text-sm">
+            {delivery.deliveredKey}
+          </pre>
+
+          <p className="text-white/60 text-xs">
+            We also emailed it to: {delivery.customerEmail}
+          </p>
         </div>
-      </Card>
+      )}
     </div>
   );
 }

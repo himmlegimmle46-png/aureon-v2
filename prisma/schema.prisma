@@ -1,0 +1,40 @@
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Product {
+  id         String      @id @default(cuid())
+  sku        String      @unique
+  name       String
+  createdAt  DateTime    @default(now())
+  stock      StockItem[]
+  deliveries Delivery[]
+}
+
+model StockItem {
+  id        String    @id @default(cuid())
+  productId String
+  product   Product   @relation(fields: [productId], references: [id])
+  key       String
+  claimedAt DateTime?
+  orderId   String?
+  sessionId String?
+  createdAt DateTime  @default(now())
+
+  @@index([productId, claimedAt])
+}
+
+model Delivery {
+  id            String   @id @default(cuid())
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id])
+  orderId       String   @unique
+  sessionId     String   @unique
+  customerEmail String
+  deliveredKey  String
+  createdAt     DateTime @default(now())
+}

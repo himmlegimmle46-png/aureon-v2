@@ -1,5 +1,7 @@
 import Stripe from "stripe";
 
+export const runtime = "nodejs";
+
 type CheckoutBody = {
   priceId?: string;
   captchaToken?: string;
@@ -23,10 +25,9 @@ function getOrigin() {
 function getStripe() {
   const key = mustGetEnv("STRIPE_SECRET_KEY");
 
-  // Cloudflare Workers runtime: use fetch-based HTTP client
+  // Node runtime (best compatibility)
   return new Stripe(key, {
     apiVersion: "2024-06-20" as Stripe.LatestApiVersion,
-    httpClient: Stripe.createFetchHttpClient(),
   });
 }
 
@@ -39,8 +40,10 @@ async function verifyTurnstile(token: string) {
     body: `secret=${encodeURIComponent(secret)}&response=${encodeURIComponent(token)}`,
   });
 
-  // Turnstile returns JSON like: { success: boolean, ... }
-  const data = (await res.json().catch(() => ({}))) as { success?: boolean; ["error-codes"]?: string[] };
+  const data = (await res.json().catch(() => ({}))) as {
+    success?: boolean;
+    ["error-codes"]?: string[];
+  };
 
   return {
     ok: !!data.success,
@@ -61,25 +64,27 @@ export async function POST(req: Request) {
     }
 
     // ✅ Captcha REQUIRED
-const captchaToken = body.captchaToken?.trim();
-if (!captchaToken) {
-  return Response.json(
-    { error: "Captcha required", debug: { hasToken: !!body.captchaToken, tokenLen: body.captchaToken?.length ?? 0 } },
-    { status: 400 }
-  );
-}
+    const captchaToken = body.captchaToken?.trim();
+    if (!captchaToken) {
+      return Response.json({ error: "Captcha required" }, { status: 400 });
+    }
 
-const turnstile = await verifyTurnstile(captchaToken);
-if (!turnstile.ok) {
-  return Response.json({ error: "Captcha failed" }, { status: 400 });
-}
+    const turnstile = await verifyTurnstile(captchaToken);
+    if (!turnstile.ok) {
+      return Response.json({ error: "Captcha failed" }, { status: 400 });
+    }
 
     const stripe = getStripe();
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${origin}/checkout/success`,
+
+      // ✅ Make sure email exists for fulfillment email
+      customer_creation: "always",
+
+      // ✅ Critical: include the checkout session id so /success can look up the delivered key
+      success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/checkout/cancel`,
     });
 
