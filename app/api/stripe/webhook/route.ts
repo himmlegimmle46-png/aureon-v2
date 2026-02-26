@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
-import { prisma } from "@/lib/prisma";
 import { Resend } from "resend";
+import { getPrisma } from "@/lib/prisma";
+const prisma = getPrisma();
 
 export const runtime = "nodejs";
 

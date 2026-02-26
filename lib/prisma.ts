@@ -1,11 +1,15 @@
+// lib/prisma.ts
 import { PrismaClient } from "@prisma/client";
 
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+let prismaSingleton: PrismaClient | null = null;
 
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    log: ["error", "warn"],
+export function getPrisma() {
+  if (prismaSingleton) return prismaSingleton;
+
+  prismaSingleton = new PrismaClient({
+    // If you later use Prisma Accelerate, set PRISMA_ACCELERATE_URL and uncomment:
+    // datasourceUrl: process.env.PRISMA_ACCELERATE_URL,
   });
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+  return prismaSingleton;
+}
