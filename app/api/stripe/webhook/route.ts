@@ -112,7 +112,9 @@ const productName = stripeProduct.name?.trim() || sku;
   let fulfillmentFailed = false;
 
   try {
-    const delivery = await prisma.$transaction(async (tx) => {
+    type Tx = Parameters<Parameters<typeof prisma.$transaction>[0]>[0];
+
+const delivery = await prisma.$transaction(async (tx: Tx) => {
       const item = await tx.stockItem.findFirst({
         where: { productId: product.id, claimedAt: null },
         orderBy: { createdAt: "asc" },
