@@ -120,15 +120,21 @@ export default function ToolKeysPage() {
           <div className="text-xs text-white/60 pb-2">Verification required to purchase</div>
 
           <Turnstile
-  siteKey="0x4AAAAAAChGqqGvElmFs8B-"
+  siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+  options={{ action: "checkout" }}
   onSuccess={(token) => {
+    console.log("TURNSTILE TOKEN:", token);
     setCaptchaToken(token);
     setError(null);
   }}
-  onExpire={() => setCaptchaToken(null)}
-  onError={() => {
+  onExpire={() => {
+    console.log("TURNSTILE EXPIRED");
     setCaptchaToken(null);
-    setError("Captcha failed to load. Please refresh and try again.");
+  }}
+  onError={() => {
+    console.log("TURNSTILE ERROR");
+    setCaptchaToken(null);
+    setError("Captcha failed to load.");
   }}
 />
 
