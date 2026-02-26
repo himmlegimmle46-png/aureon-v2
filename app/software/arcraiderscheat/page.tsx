@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { Card, Button } from "../../../components/ui";
-import { Turnstile } from "@marsidev/react-turnstile";
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 
 type Variant = {
   id: string;
@@ -37,56 +37,60 @@ const ADDON_VARIANTS: Variant[] = [
   },
 ];
 
+type CheckoutResponse = { url?: string; error?: string; codes?: string[] };
+
 export default function AddonsPage() {
-  const [loadingKey, setLoadingKey] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const captchaReady = !!captchaToken;
-
-  // ✅ This MUST exist at build time for client code
   const siteKey = "0x4AAAAAAChGqqGvElmFs8B-";
 
-  async function buy(priceId: string, key: string) {
+  const tsRef = useRef<TurnstileInstance | null>(null);
+
+  const [loadingKey, setLoadingKey] = useState<string | null>(null);
+  const [pending, setPending] = useState<{ priceId: string; key: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function callCheckout(priceId: string, token: string) {
+    const res = await fetch("/api/checkout", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ priceId, captchaToken: token }),
+    });
+
+    const data = (await res.json().catch(() => ({}))) as CheckoutResponse;
+
+    if (!res.ok) {
+      const msg =
+        data?.error ||
+        (data?.codes?.length ? `Checkout failed: ${data.codes.join(", ")}` : "Checkout failed.");
+      throw new Error(msg);
+    }
+
+    if (!data.url) throw new Error("Checkout failed (missing Stripe URL).");
+    window.location.href = data.url;
+  }
+
+  function resetAfterFailure(msg: string) {
+    setError(msg);
+    setLoadingKey(null);
+    setPending(null);
+    // token is one-time use; always reset after any failure
+    tsRef.current?.reset?.();
+  }
+
+  function begin(priceId: string, key: string) {
     setError(null);
 
-    if (!captchaToken) {
-      setError("Please complete the captcha first.");
+    if (!siteKey) {
+      resetAfterFailure("Missing Turnstile site key.");
       return;
     }
+    if (loadingKey) return; // already running
 
     setLoadingKey(key);
+    setPending({ priceId, key });
 
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ priceId, captchaToken }),
-      });
-
-      const data = (await res.json()) as { url?: string; error?: string; codes?: string[] };
-
-      if (!res.ok) {
-        const msg =
-          data?.error ||
-          (data?.codes?.length ? `Checkout failed: ${data.codes.join(", ")}` : "Checkout failed.");
-
-        // If captcha failed/expired server-side, force re-verify
-        if (msg.toLowerCase().includes("captcha")) {
-          setCaptchaToken(null);
-        }
-
-        throw new Error(msg);
-      }
-
-      if (!data.url) throw new Error("Checkout failed.");
-
-      window.location.href = data.url;
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Checkout failed. Try again.";
-      setError(msg);
-      setLoadingKey(null);
-    }
+    // Always get a fresh token for THIS click
+    tsRef.current?.reset?.();
+    tsRef.current?.execute?.();
   }
 
   return (
@@ -115,51 +119,38 @@ export default function AddonsPage() {
         <div className="grid gap-1">
           <div className="text-lg font-semibold">Available options</div>
           <div className="text-sm text-white/60">Choose an option below.</div>
-          <div className="pt-2 text-xs text-white/45">
-            Delivery instructions are shown after checkout.
-          </div>
+          <div className="pt-2 text-xs text-white/45">Delivery instructions are shown after checkout.</div>
         </div>
 
-        {/* Turnstile (one time for the whole page) */}
         <div className="mt-4">
           <div className="text-xs text-white/60 pb-2">Verification required to purchase</div>
 
-          {!siteKey ? (
-            <div className="rounded-xl border border-red-500/25 bg-red-500/10 p-3 text-sm text-red-100">
-              Missing <code>NEXT_PUBLIC_TURNSTILE_SITE_KEY</code> in Cloudflare env vars (must be{" "}
-              <b>Plaintext</b>) — redeploy after adding it.
-            </div>
-          ) : (
-            <Turnstile
-              siteKey={siteKey}
-              options={{ action: "checkout" }}
-              onSuccess={(token) => {
-                console.log("TURNSTILE TOKEN:", token);
-                setCaptchaToken(token);
-                setError(null);
-              }}
-              onExpire={() => {
-                console.log("TURNSTILE EXPIRED");
-                setCaptchaToken(null);
-              }}
-              onError={() => {
-                console.log("TURNSTILE ERROR");
-                setCaptchaToken(null);
-                setError("Captcha failed to load. Please refresh and try again.");
-              }}
-            />
-          )}
+          <Turnstile
+            ref={tsRef}
+            siteKey={siteKey}
+            options={{
+              appearance: "execute",
+              action: "checkout",
+            }}
+            onSuccess={async (token: string) => {
+              const job = pending;
+              if (!job) {
+                tsRef.current?.reset?.();
+                return;
+              }
 
-          {/* DEBUG */}
-          <div className="pt-2 text-xs text-white/50">
-            token: {captchaToken ? "YES" : "NO"} • length: {captchaToken?.length ?? 0}
-          </div>
+              try {
+                await callCheckout(job.priceId, token);
+              } catch (e: unknown) {
+                const msg = e instanceof Error ? e.message : "Checkout failed. Try again.";
+                resetAfterFailure(msg);
+              }
+            }}
+            onExpire={() => resetAfterFailure("Captcha expired. Click purchase again.")}
+            onError={() => resetAfterFailure("Captcha failed to load. Refresh and try again.")}
+          />
 
-          {!captchaReady && (
-            <div className="pt-2 text-xs text-white/50">
-              Complete verification to enable purchases.
-            </div>
-          )}
+          <div className="pt-2 text-xs text-white/50">Click Purchase to verify and start checkout.</div>
         </div>
 
         <div className="mt-4 grid divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
@@ -171,9 +162,7 @@ export default function AddonsPage() {
               <div key={v.id} className="flex items-center justify-between gap-4 px-4 py-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <span
-                    className={
-                      "h-2.5 w-2.5 rounded-sm " + (v.inStock ? "bg-emerald-400" : "bg-red-400")
-                    }
+                    className={"h-2.5 w-2.5 rounded-sm " + (v.inStock ? "bg-emerald-400" : "bg-red-400")}
                     aria-hidden
                   />
                   <div className="min-w-0 text-sm text-white/90 truncate">
@@ -185,39 +174,15 @@ export default function AddonsPage() {
 
                 <Button
                   className="shrink-0"
-                  disabled={!v.inStock || isLoading || !captchaReady}
-                  onClick={() => buy(v.priceId, key)}
+                  disabled={!v.inStock || !!loadingKey}
+                  onClick={() => begin(v.priceId, key)}
                 >
-                  {!v.inStock
-                    ? "Sold out"
-                    : isLoading
-                      ? "Loading…"
-                      : !captchaReady
-                        ? "Verify first"
-                        : "Purchase"}
+                  {!v.inStock ? "Sold out" : isLoading ? "Starting…" : "Purchase"}
                 </Button>
               </div>
             );
           })}
         </div>
-
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <div className="font-medium text-white/90">What you get</div>
-            <div className="pt-2 text-sm text-white/70">
-              Details and next steps will be shown after checkout.
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <div className="font-medium text-white/90">Support</div>
-            <div className="pt-2 text-sm text-white/70">
-              If checkout doesn’t redirect, refresh and try again. If it persists, contact support.
-            </div>
-          </div>
-        </div>
-
-        <div className="pt-3 text-xs text-white/45">Delivery instructions are shown after checkout.</div>
       </Card>
     </div>
   );

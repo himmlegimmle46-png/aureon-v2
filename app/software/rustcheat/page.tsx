@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { Card, Button } from "../../../components/ui";
-import { Turnstile } from "@marsidev/react-turnstile";
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 
 type Variant = {
   id: string;
@@ -37,55 +37,59 @@ const TOOL_KEY_VARIANTS: Variant[] = [
   },
 ];
 
+type CheckoutResponse = { url?: string; error?: string; codes?: string[] };
+
 export default function ToolKeysPage() {
-  const [loadingKey, setLoadingKey] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const captchaReady = !!captchaToken;
-
-  // ✅ must exist at build-time for client code
   const siteKey = "0x4AAAAAAChGqqGvElmFs8B-";
 
-  async function buy(priceId: string, key: string) {
+  const tsRef = useRef<TurnstileInstance | null>(null);
+
+  const [loadingKey, setLoadingKey] = useState<string | null>(null);
+  const [pending, setPending] = useState<{ priceId: string; key: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function callCheckout(priceId: string, token: string) {
+    const res = await fetch("/api/checkout", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ priceId, captchaToken: token }),
+    });
+
+    const data = (await res.json().catch(() => ({}))) as CheckoutResponse;
+
+    if (!res.ok) {
+      const msg =
+        data?.error ||
+        (data?.codes?.length ? `Checkout failed: ${data.codes.join(", ")}` : "Checkout failed.");
+      throw new Error(msg);
+    }
+
+    if (!data.url) throw new Error("Checkout failed (missing Stripe URL).");
+    window.location.href = data.url;
+  }
+
+  function resetAfterFailure(msg: string) {
+    setError(msg);
+    setLoadingKey(null);
+    setPending(null);
+    tsRef.current?.reset?.(); // token is one-time use
+  }
+
+  function begin(priceId: string, key: string) {
     setError(null);
 
-    if (!captchaToken) {
-      setError("Please complete the captcha first.");
+    if (!siteKey) {
+      resetAfterFailure("Missing Turnstile site key.");
       return;
     }
+    if (loadingKey) return;
 
     setLoadingKey(key);
+    setPending({ priceId, key });
 
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ priceId, captchaToken }),
-      });
-
-      const data = (await res.json()) as { url?: string; error?: string; codes?: string[] };
-
-      if (!res.ok) {
-        const msg =
-          data?.error ||
-          (data?.codes?.length ? `Checkout failed: ${data.codes.join(", ")}` : "Checkout failed.");
-
-        if (msg.toLowerCase().includes("captcha")) {
-          setCaptchaToken(null);
-        }
-
-        throw new Error(msg);
-      }
-
-      if (!data.url) throw new Error("Checkout failed.");
-
-      window.location.href = data.url;
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Checkout failed. Try again.";
-      setError(msg);
-      setLoadingKey(null);
-    }
+    // Fresh token per click (fixes timeout-or-duplicate)
+    tsRef.current?.reset?.();
+    tsRef.current?.execute?.();
   }
 
   return (
@@ -124,39 +128,38 @@ export default function ToolKeysPage() {
 
           {!siteKey ? (
             <div className="rounded-xl border border-red-500/25 bg-red-500/10 p-3 text-sm text-red-100">
-              Missing <code>NEXT_PUBLIC_TURNSTILE_SITE_KEY</code> in Cloudflare env vars (must be{" "}
-              <b>Plaintext</b>) — redeploy after adding it.
+              Missing Turnstile site key.
             </div>
           ) : (
             <Turnstile
+              ref={tsRef}
               siteKey={siteKey}
-              options={{ action: "checkout" }}
-              onSuccess={(token) => {
-                console.log("TURNSTILE TOKEN:", token);
-                setCaptchaToken(token);
-                setError(null);
+              options={{
+                appearance: "execute", // ✅ only generates token when we call execute()
+                action: "checkout",
               }}
-              onExpire={() => {
-                console.log("TURNSTILE EXPIRED");
-                setCaptchaToken(null);
+              onSuccess={async (token: string) => {
+                const job = pending;
+                if (!job) {
+                  tsRef.current?.reset?.();
+                  return;
+                }
+
+                try {
+                  await callCheckout(job.priceId, token);
+                } catch (e: unknown) {
+                  const msg = e instanceof Error ? e.message : "Checkout failed. Try again.";
+                  resetAfterFailure(msg);
+                }
               }}
-              onError={() => {
-                console.log("TURNSTILE ERROR");
-                setCaptchaToken(null);
-                setError("Captcha failed to load. Please refresh and try again.");
-              }}
+              onExpire={() => resetAfterFailure("Captcha expired. Click purchase again.")}
+              onError={() => resetAfterFailure("Captcha failed to load. Refresh and try again.")}
             />
           )}
 
           <div className="pt-2 text-xs text-white/50">
-            token: {captchaToken ? "YES" : "NO"} • length: {captchaToken?.length ?? 0}
+            Click <b>Purchase</b> to verify and start checkout.
           </div>
-
-          {!captchaReady && (
-            <div className="pt-2 text-xs text-white/50">
-              Complete verification to enable purchases.
-            </div>
-          )}
         </div>
 
         <div className="mt-4 grid divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
@@ -182,16 +185,10 @@ export default function ToolKeysPage() {
 
                 <Button
                   className="shrink-0"
-                  disabled={!v.inStock || isLoading || !captchaReady}
-                  onClick={() => buy(v.priceId, key)}
+                  disabled={!v.inStock || !!loadingKey}
+                  onClick={() => begin(v.priceId, key)}
                 >
-                  {!v.inStock
-                    ? "Sold out"
-                    : isLoading
-                      ? "Loading…"
-                      : !captchaReady
-                        ? "Verify first"
-                        : "Purchase"}
+                  {!v.inStock ? "Sold out" : isLoading ? "Starting…" : "Purchase"}
                 </Button>
               </div>
             );
