@@ -1,10 +1,12 @@
-import { prisma } from "@/lib/prisma";
+import { getPrisma } from "@/lib/prisma";
 
 export default async function SuccessPage({
   searchParams,
 }: {
   searchParams: { session_id?: string };
 }) {
+  const prisma = getPrisma();
+
   const sessionId = searchParams.session_id;
 
   if (!sessionId) {
@@ -36,7 +38,7 @@ export default async function SuccessPage({
           </div>
 
           <div className="text-white/70 text-sm">Your key:</div>
-          <pre className="whitespace-pre-wrap break-words rounded-xl bg-black/50 p-4 text-sm">
+          <pre className="whitespace-pre-wrap wrap-break-word rounded-xl bg-black/50 p-4 text-sm">
             {delivery.deliveredKey}
           </pre>
 
