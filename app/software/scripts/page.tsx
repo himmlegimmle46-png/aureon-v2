@@ -45,8 +45,12 @@ export default function ProductPage() {
   const tsRef = useRef<TurnstileInstance | null>(null);
 
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
-  const [pending, setPending] = useState<{ priceId: string; key: string } | null>(null);
+  const pendingRef = useRef<{ priceId: string; key: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  function setPendingJob(next: { priceId: string; key: string } | null) {
+    pendingRef.current = next;
+  }
 
   async function callCheckout(priceId: string, token: string) {
     const res = await fetch("/api/checkout", {
@@ -65,13 +69,13 @@ export default function ProductPage() {
     }
 
     if (!data.url) throw new Error("Checkout failed (missing Stripe URL).");
-    window.location.href = data.url;
+    window.location.assign(data.url);
   }
 
   function resetAfterFailure(msg: string) {
     setError(msg);
     setLoadingKey(null);
-    setPending(null);
+    setPendingJob(null);
     tsRef.current?.reset?.();
   }
 
@@ -81,7 +85,7 @@ export default function ProductPage() {
     if (loadingKey) return;
 
     setLoadingKey(key);
-    setPending({ priceId, key });
+    setPendingJob({ priceId, key });
 
     // ✅ fresh token per click (fixes timeout-or-duplicate)
     tsRef.current?.reset?.();
@@ -130,7 +134,7 @@ export default function ProductPage() {
               action: "checkout",
             }}
             onSuccess={async (token: string) => {
-              const job = pending;
+              const job = pendingRef.current;
               if (!job) {
                 tsRef.current?.reset?.();
                 return;

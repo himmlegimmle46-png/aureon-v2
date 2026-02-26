@@ -40,13 +40,18 @@ const TOOL_KEY_VARIANTS: Variant[] = [
 type CheckoutResponse = { url?: string; error?: string; codes?: string[] };
 
 export default function ToolKeysPage() {
+  // If you prefer env: const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
   const siteKey = "0x4AAAAAAChGqqGvElmFs8B-";
 
   const tsRef = useRef<TurnstileInstance | null>(null);
+  const pendingRef = useRef<{ priceId: string; key: string } | null>(null);
 
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
-  const [pending, setPending] = useState<{ priceId: string; key: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  function setPendingJob(next: { priceId: string; key: string } | null) {
+    pendingRef.current = next;
+  }
 
   async function callCheckout(priceId: string, token: string) {
     const res = await fetch("/api/checkout", {
@@ -65,13 +70,13 @@ export default function ToolKeysPage() {
     }
 
     if (!data.url) throw new Error("Checkout failed (missing Stripe URL).");
-    window.location.href = data.url;
+    window.location.assign(data.url);
   }
 
   function resetAfterFailure(msg: string) {
     setError(msg);
     setLoadingKey(null);
-    setPending(null);
+    setPendingJob(null);
     tsRef.current?.reset?.(); // token is one-time use
   }
 
@@ -85,9 +90,9 @@ export default function ToolKeysPage() {
     if (loadingKey) return;
 
     setLoadingKey(key);
-    setPending({ priceId, key });
+    setPendingJob({ priceId, key });
 
-    // Fresh token per click (fixes timeout-or-duplicate)
+    // Fresh token per click (prevents timeout/duplicate token)
     tsRef.current?.reset?.();
     tsRef.current?.execute?.();
   }
@@ -118,9 +123,7 @@ export default function ToolKeysPage() {
         <div className="grid gap-1">
           <div className="text-lg font-semibold">Available options</div>
           <div className="text-sm text-white/60">Choose an option below.</div>
-          <div className="pt-2 text-xs text-white/45">
-            Delivery instructions are shown after checkout.
-          </div>
+          <div className="pt-2 text-xs text-white/45">Delivery instructions are shown after checkout.</div>
         </div>
 
         <div className="mt-4">
@@ -135,11 +138,13 @@ export default function ToolKeysPage() {
               ref={tsRef}
               siteKey={siteKey}
               options={{
-                appearance: "execute", // ✅ only generates token when we call execute()
+                appearance: "execute", // only generates token when execute() is called
                 action: "checkout",
               }}
               onSuccess={async (token: string) => {
-                const job = pending;
+                const job = pendingRef.current;
+
+                // No pending job => ignore token & reset
                 if (!job) {
                   tsRef.current?.reset?.();
                   return;

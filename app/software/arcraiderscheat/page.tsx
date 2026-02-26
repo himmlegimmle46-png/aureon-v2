@@ -45,8 +45,12 @@ export default function AddonsPage() {
   const tsRef = useRef<TurnstileInstance | null>(null);
 
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
-  const [pending, setPending] = useState<{ priceId: string; key: string } | null>(null);
+  const pendingRef = useRef<{ priceId: string; key: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  function setPendingJob(next: { priceId: string; key: string } | null) {
+    pendingRef.current = next;
+  }
 
   async function callCheckout(priceId: string, token: string) {
     const res = await fetch("/api/checkout", {
@@ -65,13 +69,13 @@ export default function AddonsPage() {
     }
 
     if (!data.url) throw new Error("Checkout failed (missing Stripe URL).");
-    window.location.href = data.url;
+    window.location.assign(data.url);
   }
 
   function resetAfterFailure(msg: string) {
     setError(msg);
     setLoadingKey(null);
-    setPending(null);
+    setPendingJob(null);
     // token is one-time use; always reset after any failure
     tsRef.current?.reset?.();
   }
@@ -86,7 +90,7 @@ export default function AddonsPage() {
     if (loadingKey) return; // already running
 
     setLoadingKey(key);
-    setPending({ priceId, key });
+    setPendingJob({ priceId, key });
 
     // Always get a fresh token for THIS click
     tsRef.current?.reset?.();
@@ -133,7 +137,7 @@ export default function AddonsPage() {
               action: "checkout",
             }}
             onSuccess={async (token: string) => {
-              const job = pending;
+              const job = pendingRef.current;
               if (!job) {
                 tsRef.current?.reset?.();
                 return;
