@@ -1,6 +1,17 @@
+// lib/stripe.ts
 import Stripe from "stripe";
 
-const key = process.env.STRIPE_SECRET_KEY;
-if (!key) throw new Error("Missing STRIPE_SECRET_KEY");
+let stripeSingleton: Stripe | null = null;
 
-export const stripe = new Stripe(key);
+export function getStripe(): Stripe {
+  if (stripeSingleton) return stripeSingleton;
+
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error("Missing STRIPE_SECRET_KEY");
+
+  stripeSingleton = new Stripe(key, {
+    apiVersion: "2025-01-27" as Stripe.LatestApiVersion,
+  });
+
+  return stripeSingleton;
+}
