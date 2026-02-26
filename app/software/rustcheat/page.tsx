@@ -45,7 +45,7 @@ export default function ToolKeysPage() {
   const captchaReady = !!captchaToken;
 
   // ✅ must exist at build-time for client code
-  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const siteKey = "0x4AAAAAAChGqqGvElmFs8B-";
 
   async function buy(priceId: string, key: string) {
     setError(null);
