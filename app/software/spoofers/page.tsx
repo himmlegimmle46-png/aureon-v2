@@ -41,19 +41,21 @@ export default function OtherSoftwarePage() {
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Turnstile
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const captchaReady = !!captchaToken
+  const captchaReady = !!captchaToken;
+
+  // ✅ must exist at build-time for client code
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
   async function buy(priceId: string, key: string) {
-  setError(null);
+    setError(null);
 
-  if (!captchaToken) {
-    setError("Please complete the captcha first.");
-    return;
-  }
+    if (!captchaToken) {
+      setError("Please complete the captcha first.");
+      return;
+    }
 
-  setLoadingKey(key);
+    setLoadingKey(key);
 
     try {
       const res = await fetch("/api/checkout", {
@@ -62,18 +64,25 @@ export default function OtherSoftwarePage() {
         body: JSON.stringify({ priceId, captchaToken }),
       });
 
-      const data = (await res.json()) as { url?: string; error?: string };
+      const data = (await res.json()) as {
+        url?: string;
+        error?: string;
+        codes?: string[];
+      };
+
       if (!res.ok) {
-  const msg = data?.error || "Checkout failed.";
+        const msg =
+          data?.error ||
+          (data?.codes?.length ? `Checkout failed: ${data.codes.join(", ")}` : "Checkout failed.");
 
-  if (msg.toLowerCase().includes("captcha")) {
-    setCaptchaToken(null);
-  }
+        if (msg.toLowerCase().includes("captcha")) {
+          setCaptchaToken(null);
+        }
 
-  throw new Error(msg);
-}
+        throw new Error(msg);
+      }
 
-if (!data.url) throw new Error("Checkout failed.");
+      if (!data.url) throw new Error("Checkout failed.");
 
       window.location.href = data.url;
     } catch (e: unknown) {
@@ -110,42 +119,43 @@ if (!data.url) throw new Error("Checkout failed.");
           <div className="text-lg font-semibold">Available options</div>
           <div className="text-sm text-white/60">Choose an option below.</div>
           <div className="pt-2 text-xs text-white/45">
-            Delivery instructions are shown after checkout, make sure to join the discord to see the immediate stock.
+            Delivery instructions are shown after checkout, make sure to join the discord to see the
+            immediate stock.
           </div>
         </div>
 
-        {/* Turnstile (one time for the whole page) */}
         <div className="mt-4">
           <div className="text-xs text-white/60 pb-2">Verification required to purchase</div>
-          <Turnstile
-  siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-  options={{ action: "checkout" }}
-  onSuccess={(token) => {
-    console.log("TURNSTILE TOKEN:", token);
-    setCaptchaToken(token);
-    setError(null);
-  }}
-  onExpire={() => {
-    console.log("TURNSTILE EXPIRED");
-    setCaptchaToken(null);
-  }}
-  onError={() => {
-    console.log("TURNSTILE ERROR");
-    setCaptchaToken(null);
-    setError("Captcha failed to load.");
-  }}
-/>
 
-{/* ✅ DEBUG: should flip to YES after captcha */}
-<div className="pt-2 text-xs text-white/50">
-  token: {captchaToken ? "YES" : "NO"} • length: {captchaToken?.length ?? 0}
-</div>
+          {!siteKey ? (
+            <div className="rounded-xl border border-red-500/25 bg-red-500/10 p-3 text-sm text-red-100">
+              Missing <code>NEXT_PUBLIC_TURNSTILE_SITE_KEY</code> in Cloudflare env vars (must be{" "}
+              <b>Plaintext</b>) — redeploy after adding it.
+            </div>
+          ) : (
+            <Turnstile
+              siteKey={siteKey}
+              options={{ action: "checkout" }}
+              onSuccess={(token) => {
+                console.log("TURNSTILE TOKEN:", token);
+                setCaptchaToken(token);
+                setError(null);
+              }}
+              onExpire={() => {
+                console.log("TURNSTILE EXPIRED");
+                setCaptchaToken(null);
+              }}
+              onError={() => {
+                console.log("TURNSTILE ERROR");
+                setCaptchaToken(null);
+                setError("Captcha failed to load. Please refresh and try again.");
+              }}
+            />
+          )}
 
-{!captchaReady && (
-  <div className="pt-2 text-xs text-white/50">
-    Complete verification to enable purchases.
-  </div>
-)}
+          <div className="pt-2 text-xs text-white/50">
+            token: {captchaToken ? "YES" : "NO"} • length: {captchaToken?.length ?? 0}
+          </div>
 
           {!captchaReady && (
             <div className="pt-2 text-xs text-white/50">
@@ -163,7 +173,9 @@ if (!data.url) throw new Error("Checkout failed.");
               <div key={v.id} className="flex items-center justify-between gap-4 px-4 py-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <span
-                    className={"h-2.5 w-2.5 rounded-sm " + (v.inStock ? "bg-emerald-400" : "bg-red-400")}
+                    className={
+                      "h-2.5 w-2.5 rounded-sm " + (v.inStock ? "bg-emerald-400" : "bg-red-400")
+                    }
                     aria-hidden
                   />
                   <div className="min-w-0 text-sm text-white/90 truncate">
@@ -207,9 +219,7 @@ if (!data.url) throw new Error("Checkout failed.");
           </div>
         </div>
 
-        <div className="pt-3 text-xs text-white/45">
-          Delivery instructions are shown after checkout.
-        </div>
+        <div className="pt-3 text-xs text-white/45">Delivery instructions are shown after checkout.</div>
       </Card>
     </div>
   );
