@@ -45,8 +45,12 @@ export default function ToolKeysPage() {
   const tsRef = useRef<TurnstileInstance | null>(null);
 
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
-  const [pending, setPending] = useState<{ priceId: string; key: string } | null>(null);
+  const pendingRef = useRef<{ priceId: string; key: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  function setPendingJob(next: { priceId: string; key: string } | null) {
+    pendingRef.current = next;
+  }
 
   async function callCheckout(priceId: string, token: string) {
     const res = await fetch("/api/checkout", {
@@ -71,7 +75,7 @@ export default function ToolKeysPage() {
   function resetAfterFailure(msg: string) {
     setError(msg);
     setLoadingKey(null);
-    setPending(null);
+    setPendingJob(null);
     tsRef.current?.reset?.(); // token is one-time use
   }
 
@@ -85,7 +89,7 @@ export default function ToolKeysPage() {
     if (loadingKey) return;
 
     setLoadingKey(key);
-    setPending({ priceId, key });
+    setPendingJob({ priceId, key });
 
     // Fresh token per click (fixes timeout-or-duplicate)
     tsRef.current?.reset?.();
@@ -139,7 +143,7 @@ export default function ToolKeysPage() {
                 action: "checkout",
               }}
               onSuccess={async (token: string) => {
-                const job = pending;
+                const job = pendingRef.current;
                 if (!job) {
                   tsRef.current?.reset?.();
                   return;
