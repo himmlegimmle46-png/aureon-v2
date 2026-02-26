@@ -6,19 +6,19 @@ export default function SoftwareHubPage() {
     {
       href: "/software/rustcheat",
       title: "Rust",
-      desc: "Rust product listings (preset).",
+      desc: "Rust Cheats.",
       meta: "View listings →",
     },
     {
       href: "/software/arcraiderscheat",
       title: "Arc Raiders",
-      desc: "Arc Raiders product listings (preset).",
+      desc: "Arc Raiders Cheat.",
       meta: "View listings →",
     },
     {
       href: "/software/spoofers",
       title: "HWID Spoofer",
-      desc: "HWID spoofer listings (preset).",
+      desc: "HWID spoofer.",
       meta: "View listings →",
     },
   ] as const;

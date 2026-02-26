@@ -6,13 +6,13 @@ export default function RustProductsPage() {
     {
       href: "/software/rustcheat",
       title: "Rust Cheat",
-      desc: "Rust product listings (preset).",
+      desc: "Rust Cheats.",
       meta: "View listings →",
     },
     {
       href: "/software/scripts",
       title: "Rust Scripts",
-      desc: "Recoil scripts / patterns (preset).",
+      desc: "Recoil scripts.",
       meta: "View listings →",
     },
   ] as const;
