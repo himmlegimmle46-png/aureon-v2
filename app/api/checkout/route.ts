@@ -5,6 +5,7 @@ export const runtime = "nodejs";
 type CheckoutBody = {
   priceId?: string;
   captchaToken?: string;
+  turnstileToken?: string; // allow alternate client name
 };
 
 function mustGetEnv(name: string) {
@@ -24,21 +25,23 @@ function getOrigin() {
 
 function getStripe() {
   const key = mustGetEnv("STRIPE_SECRET_KEY");
-
-  // Node runtime (best compatibility)
   return new Stripe(key, {
     apiVersion: "2024-06-20" as Stripe.LatestApiVersion,
   });
 }
 
-async function verifyTurnstile(token: string) {
+async function verifyTurnstile(token: string, ip?: string | null) {
   const secret = mustGetEnv("TURNSTILE_SECRET_KEY");
 
-  const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: `secret=${encodeURIComponent(secret)}&response=${encodeURIComponent(token)}`,
-  });
+  const form = new FormData();
+  form.append("secret", secret);
+  form.append("response", token);
+  if (ip) form.append("remoteip", ip);
+
+  const res = await fetch(
+    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+    { method: "POST", body: form }
+  );
 
   const data = (await res.json().catch(() => ({}))) as {
     success?: boolean;
@@ -63,15 +66,21 @@ export async function POST(req: Request) {
       return Response.json({ error: "Invalid priceId" }, { status: 400 });
     }
 
-    // ✅ Captcha REQUIRED
-    const captchaToken = body.captchaToken?.trim();
+    // ✅ Captcha REQUIRED (accept both names)
+    const captchaToken = (body.captchaToken ?? body.turnstileToken ?? "").trim();
     if (!captchaToken) {
       return Response.json({ error: "Captcha required" }, { status: 400 });
     }
 
-    const turnstile = await verifyTurnstile(captchaToken);
+    const ip = req.headers.get("cf-connecting-ip");
+    const turnstile = await verifyTurnstile(captchaToken, ip);
+
     if (!turnstile.ok) {
-      return Response.json({ error: "Captcha failed" }, { status: 400 });
+      // 👇 this is the key change: shows why it failed
+      return Response.json(
+        { error: "Captcha failed", codes: turnstile.errorCodes },
+        { status: 400 }
+      );
     }
 
     const stripe = getStripe();
@@ -79,18 +88,14 @@ export async function POST(req: Request) {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [{ price: priceId, quantity: 1 }],
-
-      // ✅ Make sure email exists for fulfillment email
       customer_creation: "always",
-
-      // ✅ Critical: include the checkout session id so /success can look up the delivered key
       success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/checkout/cancel`,
     });
 
     return Response.json({ url: session.url });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Stripe error";
+    const message = err instanceof Error ? err.message : "Checkout error";
     return Response.json({ error: message }, { status: 500 });
   }
 }
