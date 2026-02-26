@@ -3,7 +3,6 @@ import Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { Resend } from "resend";
-import type { Prisma } from "@prisma/client";
 
 export const runtime = "nodejs";
 
@@ -113,7 +112,7 @@ const productName = stripeProduct.name?.trim() || sku;
   let fulfillmentFailed = false;
 
   try {
-    const delivery = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    const delivery = await prisma.$transaction(async (tx) => {
       const item = await tx.stockItem.findFirst({
         where: { productId: product.id, claimedAt: null },
         orderBy: { createdAt: "asc" },
