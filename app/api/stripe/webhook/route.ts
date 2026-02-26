@@ -1,19 +1,20 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { Resend } from "resend";
 import { getPrisma } from "@/lib/prisma";
-const prisma = getPrisma();
 
 export const runtime = "nodejs";
 
+type Tx = Parameters<Parameters<ReturnType<typeof getPrisma>["$transaction"]>[0]>[0];
+
 export async function POST(req: Request) {
+  const prisma = getPrisma();
+  const stripe = getStripe();
+
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!webhookSecret) {
-    return NextResponse.json(
-      { error: "Missing STRIPE_WEBHOOK_SECRET" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Missing STRIPE_WEBHOOK_SECRET" }, { status: 500 });
   }
 
   const sig = req.headers.get("stripe-signature");
@@ -48,10 +49,7 @@ export async function POST(req: Request) {
     session.customer_details?.email ?? session.customer_email ?? "";
 
   if (!customerEmail) {
-    return NextResponse.json(
-      { error: "No customer email on session" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "No customer email on session" }, { status: 400 });
   }
 
   // Idempotency: if already delivered for this session, do nothing
@@ -61,9 +59,7 @@ export async function POST(req: Request) {
   }
 
   // Determine what was purchased (assumes 1 item checkout)
-  const lineItems = await stripe.checkout.sessions.listLineItems(sessionId, {
-    limit: 10,
-  });
+  const lineItems = await stripe.checkout.sessions.listLineItems(sessionId, { limit: 10 });
 
   const priceId = lineItems.data[0]?.price?.id;
   if (!priceId) {
@@ -74,31 +70,20 @@ export async function POST(req: Request) {
   const price = await stripe.prices.retrieve(priceId, { expand: ["product"] });
 
   const stripeProduct = price.product;
-if (!stripeProduct || typeof stripeProduct === "string") {
-  return NextResponse.json(
-    { error: "Missing expanded Stripe product" },
-    { status: 400 }
-  );
-}
+  if (!stripeProduct || typeof stripeProduct === "string") {
+    return NextResponse.json({ error: "Missing expanded Stripe product" }, { status: 400 });
+  }
 
-// ✅ Narrow Product vs DeletedProduct
-if ("deleted" in stripeProduct && stripeProduct.deleted) {
-  return NextResponse.json(
-    { error: "Stripe product is deleted" },
-    { status: 400 }
-  );
-}
+  if ("deleted" in stripeProduct && stripeProduct.deleted) {
+    return NextResponse.json({ error: "Stripe product is deleted" }, { status: 400 });
+  }
 
-// Now TS knows it's a real Stripe.Product
-const sku = stripeProduct.metadata?.sku?.trim();
-if (!sku) {
-  return NextResponse.json(
-    { error: "Missing Product metadata: sku" },
-    { status: 400 }
-  );
-}
+  const sku = stripeProduct.metadata?.sku?.trim();
+  if (!sku) {
+    return NextResponse.json({ error: "Missing Product metadata: sku" }, { status: 400 });
+  }
 
-const productName = stripeProduct.name?.trim() || sku;
+  const productName = stripeProduct.name?.trim() || sku;
 
   // Ensure product exists in our DB
   const product = await prisma.product.upsert({
@@ -107,15 +92,12 @@ const productName = stripeProduct.name?.trim() || sku;
     create: { sku, name: productName },
   });
 
-  // Claim stock + create delivery atomically
   let deliveredKey = "";
   let outOfStock = false;
   let fulfillmentFailed = false;
 
   try {
-    type Tx = Parameters<Parameters<typeof prisma.$transaction>[0]>[0];
-
-const delivery = await prisma.$transaction(async (tx: Tx) => {
+    const delivery = await prisma.$transaction(async (tx: Tx) => {
       const item = await tx.stockItem.findFirst({
         where: { productId: product.id, claimedAt: null },
         orderBy: { createdAt: "asc" },
