@@ -60,6 +60,8 @@ export default function SoftwareLicensePage() {
   async function buy(priceId: string, key: string) {
     setError(null);
 
+    if (loadingKey) return;
+
     if (!captchaToken || !verifiedAt) {
       setError("Please complete verification first.");
       return;
@@ -70,13 +72,15 @@ export default function SoftwareLicensePage() {
       return;
     }
 
+    const token = captchaToken;
+    resetVerification();
     setLoadingKey(key);
 
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ priceId, captchaToken }),
+        body: JSON.stringify({ priceId, captchaToken: token }),
       });
 
       const raw = await res.text();
@@ -92,15 +96,13 @@ export default function SoftwareLicensePage() {
         const codes = data?.codes ?? [];
         const msg =
           codes.includes("timeout-or-duplicate")
-            ? "Verification expired. Please verify again."
+            ? "Verification expired or already used. Please verify again."
             : data?.error ||
               (codes.length ? `Checkout failed: ${codes.join(", ")}` : raw || `Checkout failed (${res.status}).`);
-        resetVerification();
         throw new Error(msg);
       }
 
       if (!data.url) {
-        resetVerification();
         throw new Error("Checkout failed (missing Stripe URL).");
       }
 
@@ -159,7 +161,7 @@ export default function SoftwareLicensePage() {
 
                 <div className="ml-3 flex items-center gap-3">
                   <span className={"text-xs " + (v.inStock ? "text-emerald-300" : "text-red-300")}>{v.inStock ? "In stock" : "Sold out"}</span>
-                  <Button className="shrink-0" disabled={!v.inStock || isLoading || !captchaReady} onClick={() => buy(v.priceId, key)}>
+                  <Button className="shrink-0" disabled={!v.inStock || !!loadingKey || !captchaReady} onClick={() => buy(v.priceId, key)}>
                     {!v.inStock ? "Sold out" : isLoading ? "Loading…" : !captchaReady ? "Verify first" : "Purchase"}
                   </Button>
                 </div>
