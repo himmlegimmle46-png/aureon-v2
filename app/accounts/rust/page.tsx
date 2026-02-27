@@ -29,7 +29,7 @@ const RUST_VARIANTS: Variant[] = [
 
 export default function RustAccountsPage() {
 
-  const [loadingKey, setLoadingKey] = useState<string | null>(null);
+    const [loadingKey, setLoadingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Turnstile

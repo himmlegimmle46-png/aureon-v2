@@ -114,7 +114,7 @@ export async function POST(req: Request) {
 
       return tx.delivery.create({
         data: {
-          productId: product.id,
+            productId: product.id,
           orderId,
           sessionId,
           customerEmail,

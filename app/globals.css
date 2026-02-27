@@ -36,22 +36,31 @@ body {
   position: absolute;
   inset: -50%;
   background:
-    radial-gradient(60% 40% at 30% 60%, rgba(140,90,255,0.12), transparent 70%),
-    radial-gradient(60% 40% at 70% 40%, rgba(90,220,255,0.10), transparent 70%);
-  filter: blur(40px);
+    radial-gradient(60% 40% at 30% 60%, rgba(140, 90, 255, 0.12), transparent 70%),
+    radial-gradient(60% 40% at 70% 40%, rgba(90, 220, 255, 0.10), transparent 70%);
+  filter: blur(26px);
   opacity: 0.9;
-  animation: driftMove 22s ease-in-out infinite alternate;
+  animation: driftMove 36s ease-in-out infinite alternate;
   will-change: transform;
 }
 
 @keyframes driftMove {
-  0% { transform: translate3d(-60px, 20px, 0) scale(1.05); }
-  100% { transform: translate3d(80px, -40px, 0) scale(1.10); }
+  0% {
+    transform: translate3d(-60px, 20px, 0) scale(1.05);
+  }
+  100% {
+    transform: translate3d(80px, -40px, 0) scale(1.10);
+  }
 }
 
 /* Accent text utility */
 .ac-text-accent {
-  background: linear-gradient(90deg, rgba(140,200,255,1), rgba(190,140,255,1), rgba(120,240,255,1));
+  background: linear-gradient(
+    90deg,
+    rgba(140, 200, 255, 1),
+    rgba(190, 140, 255, 1),
+    rgba(120, 240, 255, 1)
+  );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -60,28 +69,33 @@ body {
 /* Logo orb animation inside navbar */
 .ac-logo-orb {
   background:
-    radial-gradient(60% 60% at 35% 30%, rgba(140,200,255,0.55), transparent 60%),
-    radial-gradient(55% 55% at 70% 65%, rgba(190,140,255,0.45), transparent 62%),
-    radial-gradient(70% 60% at 50% 55%, rgba(120,240,255,0.28), transparent 65%);
+    radial-gradient(60% 60% at 35% 30%, rgba(140, 200, 255, 0.55), transparent 60%),
+    radial-gradient(55% 55% at 70% 65%, rgba(190, 140, 255, 0.45), transparent 62%),
+    radial-gradient(70% 60% at 50% 55%, rgba(120, 240, 255, 0.28), transparent 65%);
   filter: blur(10px);
   opacity: 0.9;
   animation: orb-rotate 6.5s linear infinite;
 }
+
 @keyframes orb-rotate {
-  from { transform: rotate(0deg) scale(1.05); }
-  to   { transform: rotate(360deg) scale(1.05); }
+  from {
+    transform: rotate(0deg) scale(1.05);
+  }
+  to {
+    transform: rotate(360deg) scale(1.05);
+  }
 }
 
 /* Active pill glow */
 .ac-nav-active {
   background:
-    radial-gradient(80% 120% at 50% 20%, rgba(140,200,255,0.22), transparent 65%),
-    radial-gradient(90% 120% at 40% 80%, rgba(190,140,255,0.18), transparent 70%),
-    rgba(255,255,255,0.06);
+    radial-gradient(80% 120% at 50% 20%, rgba(140, 200, 255, 0.22), transparent 65%),
+    radial-gradient(90% 120% at 40% 80%, rgba(190, 140, 255, 0.18), transparent 70%),
+    rgba(255, 255, 255, 0.06);
   box-shadow:
-    0 0 0 1px rgba(255,255,255,0.08),
-    0 0 26px rgba(140,200,255,0.16),
-    0 0 30px rgba(190,140,255,0.12);
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 0 26px rgba(140, 200, 255, 0.16),
+    0 0 30px rgba(190, 140, 255, 0.12);
 }
 
 /* Extra background “wow”: rotating ring */
@@ -89,26 +103,21 @@ body {
   position: absolute;
   inset: -35%;
   background:
-    radial-gradient(closest-side, transparent 62%, rgba(140,200,255,0.08) 64%, transparent 70%),
-    radial-gradient(closest-side, transparent 66%, rgba(190,140,255,0.06) 68%, transparent 74%);
-  filter: blur(12px);
-  opacity: 0.55;
-  animation: ring-spin 28s linear infinite;
+    radial-gradient(closest-side, transparent 62%, rgba(140, 200, 255, 0.08) 64%, transparent 70%),
+    radial-gradient(closest-side, transparent 66%, rgba(190, 140, 255, 0.06) 68%, transparent 74%);
+  filter: blur(8px);
+  opacity: 0.38;
+  animation: ring-spin 46s linear infinite;
   will-change: transform;
 }
-@keyframes ring-spin {
-  from { transform: rotate(0deg) scale(1.05); }
-  to   { transform: rotate(360deg) scale(1.05); }
-}
 
-/* Make aurora more noticeable */
-.ac-aurora {
-  opacity: 0.95 !important;
-  animation: aurora-pan 12s ease-in-out infinite alternate, aurora-pulse 5.5s ease-in-out infinite;
-}
-@keyframes aurora-pulse {
-  0%, 100% { filter: blur(30px) saturate(1.05); }
-  50%      { filter: blur(34px) saturate(1.25); }
+@keyframes ring-spin {
+  from {
+    transform: rotate(0deg) scale(1.05);
+  }
+  to {
+    transform: rotate(360deg) scale(1.05);
+  }
 }
 
 /* Soft nebula haze */
@@ -119,15 +128,19 @@ body {
     radial-gradient(45% 35% at 30% 45%, rgba(110, 170, 255, 0.18), transparent 62%),
     radial-gradient(40% 30% at 70% 60%, rgba(170, 120, 255, 0.15), transparent 62%),
     radial-gradient(35% 25% at 55% 35%, rgba(80, 240, 255, 0.10), transparent 62%);
-  filter: blur(34px);
-  opacity: 0.85;
-  animation: nebula-drift 18s ease-in-out infinite alternate;
+  filter: blur(24px);
+  opacity: 0.7;
+  animation: nebula-drift 30s ease-in-out infinite alternate;
   will-change: transform;
 }
 
 @keyframes nebula-drift {
-  0%   { transform: translate3d(-30px, 18px, 0) scale(1.02); }
-  100% { transform: translate3d(55px, -26px, 0) scale(1.08); }
+  0% {
+    transform: translate3d(-30px, 18px, 0) scale(1.02);
+  }
+  100% {
+    transform: translate3d(55px, -26px, 0) scale(1.08);
+  }
 }
 
 /* Aurora sweep */
@@ -138,133 +151,145 @@ body {
     radial-gradient(60% 40% at 25% 45%, rgba(120, 180, 255, 0.18), transparent 58%),
     radial-gradient(50% 35% at 70% 55%, rgba(170, 120, 255, 0.14), transparent 62%),
     radial-gradient(55% 35% at 55% 30%, rgba(80, 220, 255, 0.12), transparent 64%);
-  filter: blur(30px);
-  opacity: 0.80;
-  animation: aurora-pan 16s ease-in-out infinite alternate;
+  filter: blur(24px);
+  opacity: 0.6;
+  animation: aurora-pan 28s ease-in-out infinite alternate;
   will-change: transform;
 }
 
+/* Make aurora more noticeable */
+.ac-aurora.is-strong {
+  opacity: 0.95 !important;
+  animation:
+    aurora-pan 20s ease-in-out infinite alternate,
+    aurora-pulse 9s ease-in-out infinite;
+}
+
+@keyframes aurora-pulse {
+  0%,
+  100% {
+    filter: blur(30px) saturate(1.05);
+  }
+  50% {
+    filter: blur(34px) saturate(1.25);
+  }
+}
+
 @keyframes aurora-pan {
-  0%   { transform: translate3d(-70px, 30px, 0) scale(1.02); }
-  100% { transform: translate3d(90px, -40px, 0) scale(1.10); }
+  0% {
+    transform: translate3d(-70px, 30px, 0) scale(1.02);
+  }
+  100% {
+    transform: translate3d(90px, -40px, 0) scale(1.10);
+  }
 }
 
 .ac-topbar {
-  background:
-    linear-gradient(to bottom, rgba(0,0,0,0.92), rgba(0,0,0,0.55), rgba(0,0,0,0.00));
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 12px 50px rgba(0,0,0,0.45);
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.92),
+    rgba(0, 0, 0, 0.55),
+    rgba(0, 0, 0, 0.00)
+  );
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 50px rgba(0, 0, 0, 0.45);
 }
 
 /* Subtle film grain */
 .ac-grain {
   position: absolute;
   inset: 0;
-  opacity: 0.08;
+  opacity: 0.04;
   pointer-events: none;
-  background-image:
-    repeating-linear-gradient(
-      0deg,
-      rgba(255,255,255,0.10),
-      rgba(255,255,255,0.10) 1px,
-      transparent 1px,
-      transparent 2px
-    );
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.10),
+    rgba(255, 255, 255, 0.10) 1px,
+    transparent 1px,
+    transparent 2px
+  );
   mix-blend-mode: overlay;
-  animation: grain-shift 1.8s steps(2) infinite;
+  animation: none;
 }
 
 @keyframes grain-shift {
-  0%   { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(12px, -10px, 0); }
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(12px, -10px, 0);
+  }
 }
 
 /* Vignette */
 .ac-vignette {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.86) 100%);
+  background: radial-gradient(ellipse at center, transparent 35%, rgba(0, 0, 0, 0.86) 100%);
 }
 
 /* =========================================
    Aureon - Premium animated aurora hover
    Add class: aur-glow
-   ========================================= */
-
-@keyframes aurBorderFlow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-@keyframes aurSheenSweep {
-  0% { transform: translateX(-35%) rotate(8deg); opacity: 0; }
-  20% { opacity: 0.35; }
-  50% { opacity: 0.20; }
-  100% { transform: translateX(35%) rotate(8deg); opacity: 0; }
-}
-
-@keyframes aurGlowBreath {
-  0%, 100% { opacity: 0.35; transform: scale(0.995); }
-  50% { opacity: 0.75; transform: scale(1.01); }
-}
+========================================= */
 
 .aur-glow {
   position: relative;
-  isolation: isolate;
   transform: translateZ(0);
   transition: transform 180ms ease, filter 180ms ease;
-  will-change: transform;
+  will-change: transform, filter;
 }
 
+/* animated border layer */
 .aur-glow::before {
   content: "";
   position: absolute;
-  inset: -2px;
+  inset: -1px;
   border-radius: inherit;
-  padding: 2px;
+  padding: 1px;
+  opacity: 0;
   background: linear-gradient(
     90deg,
-    rgba(90, 220, 255, 0.95),
-    rgba(140, 90, 255, 0.95),
-    rgba(255, 130, 240, 0.80),
-    rgba(90, 220, 255, 0.95)
+    rgba(140, 200, 255, 0.55),
+    rgba(190, 140, 255, 0.55),
+    rgba(120, 240, 255, 0.55)
   );
-  background-size: 320% 320%;
-  opacity: 0;
-  z-index: -1;
-  animation: aurBorderFlow 7s ease-in-out infinite;
+  background-size: 200% 200%;
+  animation: aurBorderFlow 3.6s ease-in-out infinite;
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
-          mask-composite: exclude;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
+/* soft glow bloom */
 .aur-glow::after {
   content: "";
   position: absolute;
   inset: -18px;
   border-radius: inherit;
-  background:
-    radial-gradient(900px 320px at 20% 15%, rgba(90,220,255,0.20), transparent 60%),
-    radial-gradient(900px 320px at 80% 25%, rgba(140,90,255,0.22), transparent 62%),
-    radial-gradient(800px 360px at 50% 90%, rgba(255,130,240,0.12), transparent 65%);
   opacity: 0;
   filter: blur(18px);
-  z-index: -2;
+  background: radial-gradient(
+    circle at 50% 30%,
+    rgba(140, 200, 255, 0.22),
+    rgba(190, 140, 255, 0.14),
+    transparent 60%
+  );
+  pointer-events: none;
 }
 
+/* sheen overlay element (optional child) */
 .aur-glow > .aur-sheen {
-  pointer-events: none;
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  overflow: hidden;
-  z-index: 1;
   opacity: 0;
-  transition: opacity 180ms ease;
+  pointer-events: none;
+  overflow: hidden;
 }
 
 .aur-glow > .aur-sheen::before {
@@ -274,27 +299,60 @@ body {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(90,220,255,0.10),
-    rgba(140,90,255,0.14),
-    rgba(255,130,240,0.10),
+    rgba(255, 255, 255, 0.18),
     transparent
   );
-  filter: blur(2px);
+  transform: translateX(-35%) rotate(8deg);
   opacity: 0;
-  animation: aurSheenSweep 2.4s ease-in-out infinite;
+  animation: aurSheenSweep 2.8s ease-in-out infinite;
 }
 
+/* inner content helper (optional child) */
 .aur-glow > .aur-inner {
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  z-index: 0;
-  opacity: 0;
-  transition: opacity 180ms ease;
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.08) inset,
-    0 0 0 1px rgba(255,255,255,0.02);
+  position: relative;
+  z-index: 1;
+  opacity: 1;
+}
+
+@keyframes aurBorderFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes aurSheenSweep {
+  0% {
+    transform: translateX(-35%) rotate(8deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.20;
+  }
+  100% {
+    transform: translateX(35%) rotate(8deg);
+    opacity: 0;
+  }
+}
+
+@keyframes aurGlowBreath {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: blur(18px);
+  }
+  50% {
+    transform: scale(1.06);
+    filter: blur(20px);
+  }
 }
 
 .aur-glow:hover {
@@ -302,11 +360,22 @@ body {
   filter: brightness(1.06);
 }
 
-.aur-glow:hover::before { opacity: 1; }
-.aur-glow:hover::after  { opacity: 1; animation: aurGlowBreath 2.8s ease-in-out infinite; }
-.aur-glow:hover > .aur-sheen { opacity: 1; }
-.aur-glow:hover > .aur-sheen::before { opacity: 1; }
-.aur-glow:hover > .aur-inner { opacity: 1; }
+.aur-glow:hover::before {
+  opacity: 1;
+}
+
+.aur-glow:hover::after {
+  opacity: 1;
+  animation: aurGlowBreath 2.8s ease-in-out infinite;
+}
+
+.aur-glow:hover > .aur-sheen {
+  opacity: 1;
+}
+
+.aur-glow:hover > .aur-sheen::before {
+  opacity: 1;
+}
 
 .aur-glow:focus-visible::before,
 .aur-glow:focus-visible::after {
@@ -319,4 +388,48 @@ body {
 .ac-stars3,
 .ac-shooting {
   display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ac-drift,
+  .ac-ring,
+  .ac-aurora,
+  .ac-nebula,
+  .ac-grain,
+  .ac-logo-orb,
+  .aur-glow::before,
+  .aur-glow::after,
+  .aur-glow > .aur-sheen::before {
+    animation: none !important;
+  }
+
+  .ac-drift,
+  .ac-ring,
+  .ac-aurora,
+  .ac-nebula {
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* ===== 2026 refresh: calmer, cleaner visuals ===== */
+.ac-drift,
+.ac-ring,
+.ac-nebula,
+.ac-aurora,
+.ac-grain,
+.ac-logo-orb {
+  animation: none !important;
+}
+
+.ac-bg {
+  background:
+    radial-gradient(900px 600px at 15% 10%, rgba(70, 140, 255, 0.12), transparent 60%),
+    radial-gradient(800px 500px at 85% 25%, rgba(160, 90, 255, 0.10), transparent 60%),
+    #04060c;
+}
+
+.ac-topbar {
+  backdrop-filter: blur(6px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
