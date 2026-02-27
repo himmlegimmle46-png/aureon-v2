@@ -14,11 +14,11 @@ function mustGetEnv(name: string) {
   return v;
 }
 
-function getOrigin() {
-  const fromEnv = mustGetEnv("NEXT_PUBLIC_SITE_URL");
-  const clean = fromEnv.replace(/\/+$/, "");
+function getOrigin(req: Request) {
+  const fromEnv = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  const clean = (fromEnv || new URL(req.url).origin).replace(/\/+$/, "");
   if (!/^https?:\/\//i.test(clean)) {
-    throw new Error('NEXT_PUBLIC_SITE_URL must start with "https://"');
+    throw new Error('NEXT_PUBLIC_SITE_URL must start with "http://" or "https://"');
   }
   return clean;
 }
@@ -58,7 +58,7 @@ export async function POST(req: Request) {
   try {
     const body = (await req.json()) as CheckoutBody;
 
-    const origin = getOrigin();
+    const origin = getOrigin(req);
 
     const priceId = body.priceId?.trim();
     if (!priceId) return Response.json({ error: "Missing priceId" }, { status: 400 });
@@ -89,7 +89,7 @@ export async function POST(req: Request) {
       mode: "payment",
       line_items: [{ price: priceId, quantity: 1 }],
       customer_creation: "always",
-      success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/checkout/cancel`,
     });
 
