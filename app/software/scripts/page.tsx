@@ -73,7 +73,6 @@ export default function ScriptsPage() {
     }
 
     const token = captchaToken;
-    resetVerification();
     setLoadingKey(key);
 
     try {
@@ -99,10 +98,12 @@ export default function ScriptsPage() {
             ? "Verification expired or already used. Please verify again."
             : data?.error ||
               (codes.length ? `Checkout failed: ${codes.join(", ")}` : raw || `Checkout failed (${res.status}).`);
+        resetVerification();
         throw new Error(msg);
       }
 
       if (!data.url) {
+        resetVerification();
         throw new Error("Checkout failed (missing Stripe URL).");
       }
 

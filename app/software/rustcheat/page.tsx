@@ -13,26 +13,26 @@ type Variant = {
   inStock: boolean;
 };
 
-const TOOL_KEY_VARIANTS: Variant[] = [
+const SCRIPT_VARIANTS: Variant[] = [
   {
-    id: "Serenity Cheat 1",
-    label: "Serenity Cheat 1 day",
-    priceLabel: "$4.99",
-    priceId: "price_1T3vrzISP3QHCCrMvWLlPKkC",
+    id: "Evade Scripts 30",
+    label: "Evade Scripts 30 days",
+    priceLabel: "$25.00",
+    priceId: "price_1T3vdNISP3QHCCrMxL6U5ByH",
     inStock: true,
   },
   {
-    id: "Serenity Cheat 7",
-    label: "Serenity Cheat 7 days",
-    priceLabel: "$24.99",
-    priceId: "price_1T3vsAISP3QHCCrMTE9MiEht",
+    id: "Evade Scripts 90",
+    label: "Evade Scripts 90 days",
+    priceLabel: "$50.00",
+    priceId: "price_1T3vdnISP3QHCCrMWQMTjRk0",
     inStock: true,
   },
   {
-    id: "Serenity Cheat 30",
-    label: "Serenity Cheat 30 days",
-    priceLabel: "$49.99",
-    priceId: "price_1T3vsOISP3QHCCrMC4MLqFWv",
+    id: "Evade Scripts lifetime",
+    label: "Evade Scripts lifetime",
+    priceLabel: "$100.00",
+    priceId: "price_1T3veCISP3QHCCrM9Dj1oxM3",
     inStock: true,
   },
 ];
@@ -42,7 +42,7 @@ type CheckoutResponse = { url?: string; error?: string; codes?: string[] };
 const TURNSTILE_SITE_KEY =
   process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() || "0x4AAAAAAChGqqGvElmFs8B-";
 
-export default function ToolKeysPage() {
+export default function ScriptsPage() {
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
@@ -73,7 +73,6 @@ export default function ToolKeysPage() {
     }
 
     const token = captchaToken;
-    resetVerification();
     setLoadingKey(key);
 
     try {
@@ -99,10 +98,12 @@ export default function ToolKeysPage() {
             ? "Verification expired or already used. Please verify again."
             : data?.error ||
               (codes.length ? `Checkout failed: ${codes.join(", ")}` : raw || `Checkout failed (${res.status}).`);
+        resetVerification();
         throw new Error(msg);
       }
 
       if (!data.url) {
+        resetVerification();
         throw new Error("Checkout failed (missing Stripe URL).");
       }
 
@@ -118,8 +119,8 @@ export default function ToolKeysPage() {
     <div className="grid gap-6">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Rust Cheat</h1>
-          <p className="pt-1 text-sm text-white/60">Licenses</p>
+          <h1 className="text-2xl font-semibold">Scripts</h1>
+          <p className="pt-1 text-sm text-white/60">Digital download</p>
         </div>
         <Link className="text-sm text-white/70 underline underline-offset-4 hover:text-white" href="/software">
           Back
@@ -148,8 +149,8 @@ export default function ToolKeysPage() {
         </div>
 
         <div className="mt-4 grid gap-2">
-          {TOOL_KEY_VARIANTS.map((v) => {
-            const key = `toolkeys:${v.id}`;
+          {SCRIPT_VARIANTS.map((v) => {
+            const key = `scripts:${v.id}`;
             const isLoading = loadingKey === key;
 
             return (
