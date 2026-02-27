@@ -139,13 +139,13 @@ export async function POST(req: Request) {
 
   // Email the key (optional but recommended)
   const resendKey = process.env.RESEND_API_KEY;
-  const from = process.env.FULFILL_FROM_EMAIL;
+  const from = process.env.FULFILL_FROM_EMAIL || process.env.RESEND_FROM_EMAIL;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
   if (resendKey && from && siteUrl) {
     const resend = new Resend(resendKey);
 
-    const successUrl = `${siteUrl.replace(/\/+$/, "")}/success?session_id=${encodeURIComponent(
+    const successUrl = `${siteUrl.replace(/\/+$/, "")}/checkout/success?session_id=${encodeURIComponent(
       sessionId
     )}`;
 

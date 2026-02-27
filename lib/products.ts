@@ -1,12 +1,29 @@
 export function skuFromPriceId(priceId: string): string | null {
-  // Replace these with YOUR real Stripe price IDs
   switch (priceId) {
-    case "price_REPLACE_ME_RUST_0_100":
-      return "rust-0-100";
-    case "price_REPLACE_ME_RUST_100_500":
-      return "rust-100-500";
-    case "price_REPLACE_ME_RUST_500_1000":
-      return "rust-500-1000";
+    case "price_1T3wS5ISP3QHCCrM9Mhuiwau":
+      return "rust-account-0-1500";
+
+    case "price_1T3vrzISP3QHCCrMvWLlPKkC":
+      return "serenity-cheat-1d";
+    case "price_1T3vsAISP3QHCCrMTE9MiEht":
+      return "serenity-cheat-7d";
+    case "price_1T3vsOISP3QHCCrMC4MLqFWv":
+      return "serenity-cheat-30d";
+
+    case "price_1T3vegISP3QHCCrM51PKxVzz":
+      return "exception-spoofer-1d";
+    case "price_1T3vezISP3QHCCrMI6dMjXDn":
+      return "exception-spoofer-7d";
+    case "price_1T3vfLISP3QHCCrMju6wy42g":
+      return "exception-spoofer-30d";
+
+    case "price_1T3vdNISP3QHCCrMxL6U5ByH":
+      return "evade-scripts-30d";
+    case "price_1T3vdnISP3QHCCrMWQMTjRk0":
+      return "evade-scripts-90d";
+    case "price_1T3veCISP3QHCCrM9Dj1oxM3":
+      return "evade-scripts-lifetime";
+
     default:
       return null;
   }
