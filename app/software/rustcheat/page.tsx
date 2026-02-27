@@ -46,14 +46,29 @@ export default function ToolKeysPage() {
         body: JSON.stringify({ priceId, captchaToken }),
       });
 
-      const data = (await res.json().catch(() => ({}))) as CheckoutResponse;
+      const raw = await res.text();
+      const data = (() => {
+        try {
+          return (raw ? JSON.parse(raw) : {}) as CheckoutResponse;
+        } catch {
+          return {} as CheckoutResponse;
+        }
+      })();
       if (!res.ok) {
-        const msg = data?.error || (data?.codes?.length ? `Checkout failed: ${data.codes.join(", ")}` : "Checkout failed.");
-        if (msg.toLowerCase().includes("captcha")) setCaptchaToken(null);
+        const msg =
+          data?.error ||
+          (data?.codes?.length
+            ? `Checkout failed: ${data.codes.join(", ")}`
+            : raw || `Checkout failed (${res.status}).`);
+        // Turnstile tokens are one-time use; require a fresh verification after any failed attempt.
+        setCaptchaToken(null);
         throw new Error(msg);
       }
 
-      if (!data.url) throw new Error("Checkout failed (missing Stripe URL).");
+      if (!data.url) {
+        setCaptchaToken(null);
+        throw new Error("Checkout failed (missing Stripe URL).");
+      }
       window.location.assign(data.url);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Checkout failed. Try again.";
