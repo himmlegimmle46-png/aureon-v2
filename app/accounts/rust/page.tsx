@@ -53,13 +53,21 @@ export default function RustAccountsPage() {
         body: JSON.stringify({ priceId, captchaToken }),
       });
 
-      const data = (await res.json()) as { url?: string; error?: string };
+      const data = (await res.json().catch(() => ({}))) as {
+        url?: string;
+        error?: string;
+        codes?: string[];
+      };
 
       if (!res.ok) {
-        const msg = data?.error || "Checkout failed.";
+        const codes = data?.codes ?? [];
+        const msg =
+          codes.includes("timeout-or-duplicate")
+            ? "Verification expired or already used. Please verify again."
+            : data?.error ||
+              (codes.length ? `Checkout failed: ${codes.join(", ")}` : "Checkout failed.");
 
-        // If captcha failed/expired server-side, force re-verify
-        if (msg.toLowerCase().includes("captcha")) {
+        if (msg.toLowerCase().includes("captcha") || codes.length) {
           setCaptchaToken(null);
         }
 

@@ -8,6 +8,14 @@ type CheckoutBody = {
   turnstileToken?: string;
 };
 
+type TurnstileVerifyResult = {
+  ok: boolean;
+  errorCodes: string[];
+  hostname: string | null;
+  challengeTs: string | null;
+  action: string | null;
+};
+
 function mustGetEnv(name: string) {
   const v = process.env[name]?.trim();
   if (!v) throw new Error(`Missing ${name}`);
@@ -23,7 +31,19 @@ function getOrigin(req: Request) {
   return clean;
 }
 
-async function verifyTurnstile(token: string, ip?: string | null) {
+function requestHost(req: Request) {
+  return req.headers.get("x-forwarded-host") || req.headers.get("host") || "unknown";
+}
+
+function requestIp(req: Request) {
+  return (
+    req.headers.get("cf-connecting-ip") ||
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    null
+  );
+}
+
+async function verifyTurnstile(token: string, ip?: string | null): Promise<TurnstileVerifyResult> {
   const secret = mustGetEnv("TURNSTILE_SECRET_KEY");
 
   const form = new FormData();
@@ -38,16 +58,25 @@ async function verifyTurnstile(token: string, ip?: string | null) {
 
   const data = (await res.json().catch(() => ({}))) as {
     success?: boolean;
+    hostname?: string;
+    challenge_ts?: string;
+    action?: string;
     ["error-codes"]?: string[];
   };
 
   return {
     ok: !!data.success,
     errorCodes: data["error-codes"] ?? [],
+    hostname: data.hostname ?? null,
+    challengeTs: data.challenge_ts ?? null,
+    action: data.action ?? null,
   };
 }
 
 export async function POST(req: Request) {
+  const ts = new Date().toISOString();
+  const host = requestHost(req);
+
   try {
     const body = (await req.json()) as CheckoutBody;
     const origin = getOrigin(req);
@@ -63,10 +92,32 @@ export async function POST(req: Request) {
       return Response.json({ error: "Captcha required" }, { status: 400 });
     }
 
-    const ip = req.headers.get("cf-connecting-ip");
+    const ip = requestIp(req);
     const turnstile = await verifyTurnstile(captchaToken, ip);
+
     if (!turnstile.ok) {
-      return Response.json({ error: "Captcha failed", codes: turnstile.errorCodes }, { status: 400 });
+      // Temporary debug logging for captcha diagnostics in production
+      console.warn("[checkout][turnstile_failed]", {
+        ts,
+        host,
+        ip,
+        origin,
+        priceId,
+        codes: turnstile.errorCodes,
+        turnstileHostname: turnstile.hostname,
+        turnstileAction: turnstile.action,
+        turnstileChallengeTs: turnstile.challengeTs,
+      });
+
+      return Response.json(
+        {
+          error: "Captcha failed",
+          codes: turnstile.errorCodes,
+          host,
+          ts,
+        },
+        { status: 400 }
+      );
     }
 
     const stripe = getStripe();
@@ -81,6 +132,13 @@ export async function POST(req: Request) {
     return Response.json({ url: session.url });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Checkout error";
+
+    console.error("[checkout][server_error]", {
+      ts,
+      host,
+      message,
+    });
+
     return Response.json({ error: message }, { status: 500 });
   }
 }
