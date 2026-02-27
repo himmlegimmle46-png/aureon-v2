@@ -15,21 +15,21 @@ type Variant = {
 
 const ADDON_VARIANTS: Variant[] = [
   {
-    id: "Serenity Cheat 1",
+    id: "arc-raiders-serenity-1",
     label: "Serenity Cheat 1 day",
     priceLabel: "$4.00",
     priceId: "price_1T3vrzISP3QHCCrMvWLlPKkC",
     inStock: true,
   },
   {
-    id: "Serenity Cheat 7",
+    id: "arc-raiders-serenity-7",
     label: "Serenity Cheat 7 days",
     priceLabel: "$20.00",
     priceId: "price_1T3vsAISP3QHCCrMTE9MiEht",
     inStock: true,
   },
   {
-    id: "Serenity Cheat 30",
+    id: "arc-raiders-serenity-30",
     label: "Serenity Cheat 30 days",
     priceLabel: "$40.00",
     priceId: "price_1T3vsOISP3QHCCrMC4MLqFWv",

@@ -15,21 +15,21 @@ type Variant = {
 
 const SCRIPT_VARIANTS: Variant[] = [
   {
-    id: "Evade Scripts 30",
+    id: "evade-scripts-30",
     label: "Evade Scripts 30 days",
     priceLabel: "$25.00",
     priceId: "price_1T3vdNISP3QHCCrMxL6U5ByH",
     inStock: true,
   },
   {
-    id: "Evade Scripts 90",
+    id: "evade-scripts-90",
     label: "Evade Scripts 90 days",
     priceLabel: "$50.00",
     priceId: "price_1T3vdnISP3QHCCrMWQMTjRk0",
     inStock: true,
   },
   {
-    id: "Evade Scripts lifetime",
+    id: "evade-scripts-lifetime",
     label: "Evade Scripts lifetime",
     priceLabel: "$100.00",
     priceId: "price_1T3veCISP3QHCCrM9Dj1oxM3",
