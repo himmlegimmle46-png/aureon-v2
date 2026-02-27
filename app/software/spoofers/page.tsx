@@ -29,7 +29,7 @@ const OTHER_SOFTWARE_VARIANTS: Variant[] = [
     inStock: true,
   },
   {
-    id: "exception-spoofer-30",
+    id: "xxception-spoofer-30",
     label: "Exception Spoofer 30 days",
     priceLabel: "$22.00",
     priceId: "price_1T3vfLISP3QHCCrMju6wy42g",
@@ -50,10 +50,10 @@ export default function SoftwareLicensePage() {
   const [turnstileRenderKey, setTurnstileRenderKey] = useState(0);
   const captchaReady = !!captchaToken;
 
-  function resetVerification(message?: string) {
+  function resetVerification(message?: string, forceRerender = false) {
     setCaptchaToken(null);
     setVerifiedAt(null);
-    setTurnstileRenderKey((v) => v + 1);
+    if (forceRerender) setTurnstileRenderKey((v) => v + 1);
     if (message) setError(message);
   }
 
@@ -68,7 +68,7 @@ export default function SoftwareLicensePage() {
     }
 
     if (Date.now() - verifiedAt > 4 * 60 * 1000) {
-      resetVerification("Verification expired. Please verify again.");
+      resetVerification("Verification expired. Please verify again.", true);
       return;
     }
 
@@ -98,7 +98,7 @@ export default function SoftwareLicensePage() {
             ? "Verification expired or already used. Please verify again."
             : data?.error ||
               (codes.length ? `Checkout failed: ${codes.join(", ")}` : raw || `Checkout failed (${res.status}).`);
-        resetVerification();
+        resetVerification(undefined, codes.includes("timeout-or-duplicate"));
         throw new Error(msg);
       }
 
@@ -144,7 +144,11 @@ export default function SoftwareLicensePage() {
               setError(null);
             }}
             onExpire={() => resetVerification()}
-            onError={() => resetVerification("Captcha failed to load. Disable adblock/shields and refresh.")}
+            onError={() => {
+              setCaptchaToken(null);
+              setVerifiedAt(null);
+              setError("Captcha failed to load. Disable adblock/shields and refresh.");
+            }}
           />
         </div>
 

@@ -15,21 +15,21 @@ type Variant = {
 
 const ADDON_VARIANTS: Variant[] = [
   {
-    id: "arc-raiders-serenity-1",
+    id: "arcraiders-serenity-1",
     label: "Serenity Cheat 1 day",
     priceLabel: "$4.00",
     priceId: "price_1T3vrzISP3QHCCrMvWLlPKkC",
     inStock: true,
   },
   {
-    id: "arc-raiders-serenity-7",
+    id: "arcraiders-serenity-7",
     label: "Serenity Cheat 7 days",
     priceLabel: "$20.00",
     priceId: "price_1T3vsAISP3QHCCrMTE9MiEht",
     inStock: true,
   },
   {
-    id: "arc-raiders-serenity-30",
+    id: "arcraiders-serenity-30",
     label: "Serenity Cheat 30 days",
     priceLabel: "$40.00",
     priceId: "price_1T3vsOISP3QHCCrMC4MLqFWv",
@@ -50,10 +50,10 @@ export default function ArcRaidersPage() {
   const [turnstileRenderKey, setTurnstileRenderKey] = useState(0);
   const captchaReady = !!captchaToken;
 
-  function resetVerification(message?: string) {
+  function resetVerification(message?: string, forceRerender = false) {
     setCaptchaToken(null);
     setVerifiedAt(null);
-    setTurnstileRenderKey((v) => v + 1);
+    if (forceRerender) setTurnstileRenderKey((v) => v + 1);
     if (message) setError(message);
   }
 
@@ -68,7 +68,7 @@ export default function ArcRaidersPage() {
     }
 
     if (Date.now() - verifiedAt > 4 * 60 * 1000) {
-      resetVerification("Verification expired. Please verify again.");
+      resetVerification("Verification expired. Please verify again.", true);
       return;
     }
 
@@ -98,7 +98,7 @@ export default function ArcRaidersPage() {
             ? "Verification expired or already used. Please verify again."
             : data?.error ||
               (codes.length ? `Checkout failed: ${codes.join(", ")}` : raw || `Checkout failed (${res.status}).`);
-        resetVerification();
+        resetVerification(undefined, codes.includes("timeout-or-duplicate"));
         throw new Error(msg);
       }
 
@@ -144,7 +144,11 @@ export default function ArcRaidersPage() {
               setError(null);
             }}
             onExpire={() => resetVerification()}
-            onError={() => resetVerification("Captcha failed to load. Disable adblock/shields and refresh.")}
+            onError={() => {
+              setCaptchaToken(null);
+              setVerifiedAt(null);
+              setError("Captcha failed to load. Disable adblock/shields and refresh.");
+            }}
           />
         </div>
 
