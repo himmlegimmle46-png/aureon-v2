@@ -13,10 +13,28 @@ type Variant = {
   inStock: boolean;
 };
 
-const MACRO_VARIANTS: Variant[] = [
-  { id: "Evade Scripts 30", label: "Evade Scripts 30 days", priceLabel: "$25.00", priceId: "price_1T3vdNISP3QHCCrMxL6U5ByH", inStock: true },
-  { id: "Evade Scripts 90", label: "Evade Scripts 90 days", priceLabel: "$50.00", priceId: "price_1T3vdnISP3QHCCrMWQMTjRk0", inStock: true },
-  { id: "Evade Scripts lifetime", label: "Evade Scripts lifetime", priceLabel: "$100.00", priceId: "price_1T3veCISP3QHCCrM9Dj1oxM3", inStock: true },
+const SCRIPT_VARIANTS: Variant[] = [
+  {
+    id: "Evade Scripts 30",
+    label: "Evade Scripts 30 days",
+    priceLabel: "$25.00",
+    priceId: "price_1T3vdNISP3QHCCrMxL6U5ByH",
+    inStock: true,
+  },
+  {
+    id: "Evade Scripts 90",
+    label: "Evade Scripts 90 days",
+    priceLabel: "$50.00",
+    priceId: "price_1T3vdnISP3QHCCrMWQMTjRk0",
+    inStock: true,
+  },
+  {
+    id: "Evade Scripts lifetime",
+    label: "Evade Scripts lifetime",
+    priceLabel: "$100.00",
+    priceId: "price_1T3veCISP3QHCCrM9Dj1oxM3",
+    inStock: true,
+  },
 ];
 
 type CheckoutResponse = { url?: string; error?: string; codes?: string[] };
@@ -24,16 +42,31 @@ type CheckoutResponse = { url?: string; error?: string; codes?: string[] };
 const TURNSTILE_SITE_KEY =
   process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() || "0x4AAAAAAChGqqGvElmFs8B-";
 
-export default function ProductPage() {
+export default function ScriptsPage() {
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [verifiedAt, setVerifiedAt] = useState<number | null>(null);
+  const [turnstileRenderKey, setTurnstileRenderKey] = useState(0);
   const captchaReady = !!captchaToken;
+
+  function resetVerification(message?: string) {
+    setCaptchaToken(null);
+    setVerifiedAt(null);
+    setTurnstileRenderKey((v) => v + 1);
+    if (message) setError(message);
+  }
 
   async function buy(priceId: string, key: string) {
     setError(null);
-    if (!captchaToken) {
+
+    if (!captchaToken || !verifiedAt) {
       setError("Please complete verification first.");
+      return;
+    }
+
+    if (Date.now() - verifiedAt > 4 * 60 * 1000) {
+      resetVerification("Verification expired. Please verify again.");
       return;
     }
 
@@ -54,21 +87,23 @@ export default function ProductPage() {
           return {} as CheckoutResponse;
         }
       })();
+
       if (!res.ok) {
+        const codes = data?.codes ?? [];
         const msg =
-          data?.error ||
-          (data?.codes?.length
-            ? `Checkout failed: ${data.codes.join(", ")}`
-            : raw || `Checkout failed (${res.status}).`);
-        // Turnstile tokens are one-time use; require a fresh verification after any failed attempt.
-        setCaptchaToken(null);
+          codes.includes("timeout-or-duplicate")
+            ? "Verification expired. Please verify again."
+            : data?.error ||
+              (codes.length ? `Checkout failed: ${codes.join(", ")}` : raw || `Checkout failed (${res.status}).`);
+        resetVerification();
         throw new Error(msg);
       }
 
       if (!data.url) {
-        setCaptchaToken(null);
+        resetVerification();
         throw new Error("Checkout failed (missing Stripe URL).");
       }
+
       window.location.assign(data.url);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Checkout failed. Try again.";
@@ -81,72 +116,57 @@ export default function ProductPage() {
     <div className="grid gap-6">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Digital Download</h1>
-          <p className="text-sm text-white/60 pt-1">Instant delivery • simple checkout</p>
+          <h1 className="text-2xl font-semibold">Scripts</h1>
+          <p className="pt-1 text-sm text-white/60">Digital download</p>
         </div>
-        <Link className="text-sm text-white/70 hover:text-white underline underline-offset-4" href="/software">Back</Link>
+        <Link className="text-sm text-white/70 underline underline-offset-4 hover:text-white" href="/software">
+          Back
+        </Link>
       </div>
 
       {error && <div className="rounded-2xl border border-red-500/25 bg-red-500/10 p-4 text-sm text-red-100">{error}</div>}
 
       <Card className="p-5">
-        <div className="grid gap-1">
-          <div className="text-lg font-semibold">Available options</div>
-          <div className="text-sm text-white/60">Choose an option below.</div>
-          <div className="pt-2 text-xs text-white/45">Delivery instructions are shown after checkout.</div>
-        </div>
+        <div className="text-lg font-semibold">Select a plan</div>
 
         <div className="mt-4">
-          <div className="text-xs text-white/60 pb-2">Verification required to purchase</div>
+          <div className="pb-2 text-xs text-white/60">Verification required</div>
           <Turnstile
+            key={turnstileRenderKey}
             siteKey={TURNSTILE_SITE_KEY}
             options={{ action: "checkout" }}
             onSuccess={(token) => {
               setCaptchaToken(token);
+              setVerifiedAt(Date.now());
               setError(null);
             }}
-            onExpire={() => setCaptchaToken(null)}
-            onError={() => {
-              setCaptchaToken(null);
-              setError("Captcha failed to load. Disable adblock/shields and refresh.");
-            }}
+            onExpire={() => resetVerification()}
+            onError={() => resetVerification("Captcha failed to load. Disable adblock/shields and refresh.")}
           />
-          {!captchaReady && <div className="pt-2 text-xs text-white/50">Verify first, then the button changes to Purchase.</div>}
         </div>
 
-        <div className="mt-4 grid divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
-          {MACRO_VARIANTS.map((v) => {
-            const key = `product:${v.id}`;
+        <div className="mt-4 grid gap-2">
+          {SCRIPT_VARIANTS.map((v) => {
+            const key = `scripts:${v.id}`;
             const isLoading = loadingKey === key;
+
             return (
-              <div key={v.id} className="flex items-center justify-between gap-4 px-4 py-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <span className={"h-2.5 w-2.5 rounded-sm " + (v.inStock ? "bg-emerald-400" : "bg-red-400")} aria-hidden />
-                  <div className="min-w-0 text-sm text-white/90 truncate">
-                    <span className="font-semibold">{v.priceLabel}</span> <span className="text-white/60">/</span>{" "}
-                    <span className="text-white/70">{v.label}</span>
-                  </div>
+              <div key={v.id} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-medium text-white">{v.label}</div>
+                  <div className="text-sm text-white/70">{v.priceLabel}</div>
                 </div>
-                <Button className="shrink-0" disabled={!v.inStock || isLoading || !captchaReady} onClick={() => buy(v.priceId, key)}>
-                  {!v.inStock ? "Sold out" : isLoading ? "Loading…" : !captchaReady ? "Verify first" : "Purchase"}
-                </Button>
+
+                <div className="ml-3 flex items-center gap-3">
+                  <span className={"text-xs " + (v.inStock ? "text-emerald-300" : "text-red-300")}>{v.inStock ? "In stock" : "Sold out"}</span>
+                  <Button className="shrink-0" disabled={!v.inStock || isLoading || !captchaReady} onClick={() => buy(v.priceId, key)}>
+                    {!v.inStock ? "Sold out" : isLoading ? "Loading…" : !captchaReady ? "Verify first" : "Purchase"}
+                  </Button>
+                </div>
               </div>
             );
           })}
         </div>
-
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <div className="font-medium text-white/90">What you get</div>
-            <div className="pt-2 text-sm text-white/70">Files + instructions shown after checkout.</div>
-          </div>
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <div className="font-medium text-white/90">FAQ</div>
-            <div className="pt-2 text-sm text-white/70">If checkout doesn’t redirect, refresh and try again. If it persists, contact support.</div>
-          </div>
-        </div>
-
-        <div className="pt-3 text-xs text-white/45">Delivery instructions are shown after checkout.</div>
       </Card>
     </div>
   );
