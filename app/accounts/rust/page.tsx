@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { Card, Button } from "../../../components/ui";
 
@@ -8,7 +7,7 @@ type Variant = {
   id: string;
   label: string;
   priceLabel: string;
-  priceId: string;
+  checkoutUrl: string;
   inStock: boolean;
 };
 
@@ -17,45 +16,12 @@ const RUST_VARIANTS: Variant[] = [
     id: "0-1500",
     label: "Rust  NFA accounts with 0–1500 hours",
     priceLabel: "$2.00",
-    priceId: "price_1T3wS5ISP3QHCCrM9Mhuiwau",
+    checkoutUrl: "https://buy.stripe.com/00wdRabNYasL1aGcgv9IQ01",
     inStock: true,
   },
 ];
 
 export default function RustAccountsPage() {
-  const [loadingKey, setLoadingKey] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  async function buy(priceId: string, key: string) {
-    setError(null);
-    setLoadingKey(key);
-
-    try {
-      const res = await fetch("/api/create-checkout", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ priceId }),
-      });
-
-      const data = (await res.json().catch(() => ({}))) as {
-        url?: string;
-        error?: string;
-      };
-
-      if (!res.ok) {
-        throw new Error(data?.error || "Checkout failed.");
-      }
-
-      if (!data.url) throw new Error("Checkout failed.");
-
-      window.location.href = data.url;
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Checkout failed. Try again.";
-      setError(msg);
-      setLoadingKey(null);
-    }
-  }
-
   return (
     <div className="grid gap-6">
       <div className="flex items-end justify-between gap-4">
@@ -69,10 +35,6 @@ export default function RustAccountsPage() {
         </Link>
       </div>
 
-      {error && (
-        <div className="rounded-2xl border border-red-500/25 bg-red-500/10 p-4 text-sm text-red-100">{error}</div>
-      )}
-
       <Card className="p-5">
         <div className="grid gap-1">
           <div className="text-lg font-semibold">Rust NFA Account</div>
@@ -81,30 +43,29 @@ export default function RustAccountsPage() {
         </div>
 
         <div className="mt-4 grid divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
-          {RUST_VARIANTS.map((v) => {
-            const key = `rust:${v.id}`;
-            const isLoading = loadingKey === key;
-
-            return (
-              <div key={v.id} className="flex items-center justify-between gap-4 px-4 py-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <span
-                    className={"h-2.5 w-2.5 rounded-sm " + (v.inStock ? "bg-emerald-400" : "bg-red-400")}
-                    aria-hidden
-                  />
-                  <div className="min-w-0 text-sm text-white/90 truncate">
-                    <span className="font-semibold">{v.priceLabel}</span>{" "}
-                    <span className="text-white/60">/</span>{" "}
-                    <span className="text-white/70">{v.label}</span>
-                  </div>
+          {RUST_VARIANTS.map((v) => (
+            <div key={v.id} className="flex items-center justify-between gap-4 px-4 py-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <span
+                  className={"h-2.5 w-2.5 rounded-sm " + (v.inStock ? "bg-emerald-400" : "bg-red-400")}
+                  aria-hidden
+                />
+                <div className="min-w-0 text-sm text-white/90 truncate">
+                  <span className="font-semibold">{v.priceLabel}</span>{" "}
+                  <span className="text-white/60">/</span>{" "}
+                  <span className="text-white/70">{v.label}</span>
                 </div>
-
-                <Button className="shrink-0" disabled={!v.inStock || isLoading} onClick={() => buy(v.priceId, key)}>
-                  {!v.inStock ? "Sold out" : isLoading ? "Loading…" : "Purchase"}
-                </Button>
               </div>
-            );
-          })}
+
+              <Button
+                className="shrink-0"
+                disabled={!v.inStock}
+                onClick={() => window.location.assign(v.checkoutUrl)}
+              >
+                {!v.inStock ? "Sold out" : "Purchase"}
+              </Button>
+            </div>
+          ))}
         </div>
 
         <div className="pt-3 text-xs text-white/45">Delivery instructions are shown after checkout.</div>
