@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Card, Button } from "../../../components/ui";
-import { Turnstile } from "@marsidev/react-turnstile";
 
 type Variant = {
   id: string;
@@ -12,10 +11,6 @@ type Variant = {
   priceId: string;
   inStock: boolean;
 };
-
-// Uses your env var if present; falls back to your key.
-const TURNSTILE_SITE_KEY =
-  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() || "0x4AAAAAAChGqqGvElmFs8B-";
 
 const RUST_VARIANTS: Variant[] = [
   {
@@ -28,51 +23,27 @@ const RUST_VARIANTS: Variant[] = [
 ];
 
 export default function RustAccountsPage() {
-
-    const [loadingKey, setLoadingKey] = useState<string | null>(null);
+  const [loadingKey, setLoadingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  // Turnstile
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const captchaReady = !!captchaToken;
 
   async function buy(priceId: string, key: string) {
     setError(null);
-
-    // Don’t even call the API without a token
-    if (!captchaToken) {
-      setError("Please complete the captcha first.");
-      return;
-    }
-
     setLoadingKey(key);
 
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ priceId, captchaToken }),
+        body: JSON.stringify({ priceId }),
       });
 
       const data = (await res.json().catch(() => ({}))) as {
         url?: string;
         error?: string;
-        codes?: string[];
       };
 
       if (!res.ok) {
-        const codes = data?.codes ?? [];
-        const msg =
-          codes.includes("timeout-or-duplicate")
-            ? "Verification expired or already used. Please verify again."
-            : data?.error ||
-              (codes.length ? `Checkout failed: ${codes.join(", ")}` : "Checkout failed.");
-
-        if (msg.toLowerCase().includes("captcha") || codes.length) {
-          setCaptchaToken(null);
-        }
-
-        throw new Error(msg);
+        throw new Error(data?.error || "Checkout failed.");
       }
 
       if (!data.url) throw new Error("Checkout failed.");
@@ -109,28 +80,6 @@ export default function RustAccountsPage() {
           <div className="pt-2 text-xs text-white/45">OS: All • Game client: Steam</div>
         </div>
 
-        {/* Turnstile */}
-        <div className="mt-4">
-          <div className="text-xs text-white/60 pb-2">Verification required to purchase</div>
-
-          <Turnstile
-            siteKey={TURNSTILE_SITE_KEY}
-            onSuccess={(token) => {
-              setCaptchaToken(token);
-              setError(null);
-            }}
-            onExpire={() => setCaptchaToken(null)}
-            onError={() => {
-              setCaptchaToken(null);
-              setError("Captcha failed to load. Disable adblock/shields and refresh.");
-            }}
-          />
-
-          {!captchaReady && (
-            <div className="pt-2 text-xs text-white/50">Complete verification to enable purchases.</div>
-          )}
-        </div>
-
         <div className="mt-4 grid divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
           {RUST_VARIANTS.map((v) => {
             const key = `rust:${v.id}`;
@@ -150,18 +99,14 @@ export default function RustAccountsPage() {
                   </div>
                 </div>
 
-                <Button
-                  className="shrink-0"
-                  disabled={!v.inStock || isLoading || !captchaReady}
-                  onClick={() => buy(v.priceId, key)}
-                >
-                  {!v.inStock ? "Sold out" : isLoading ? "Loading…" : !captchaReady ? "Verify first" : "Purchase"}
+                <Button className="shrink-0" disabled={!v.inStock || isLoading} onClick={() => buy(v.priceId, key)}>
+                  {!v.inStock ? "Sold out" : isLoading ? "Loading…" : "Purchase"}
                 </Button>
               </div>
             );
           })}
         </div>
-        
+
         <div className="pt-3 text-xs text-white/45">Delivery instructions are shown after checkout.</div>
       </Card>
     </div>

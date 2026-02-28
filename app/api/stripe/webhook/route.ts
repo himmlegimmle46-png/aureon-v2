@@ -3,6 +3,8 @@ import Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { Resend } from "resend";
 import { getPrisma } from "@/lib/prisma";
+import { createDeliveryToken } from "@/lib/delivery-access";
+import { revealStockSecret } from "@/lib/stock-secrets";
 
 export const runtime = "nodejs";
 
@@ -45,29 +47,32 @@ export async function POST(req: Request) {
   const sessionId = session.id;
   const orderId = session.payment_intent?.toString() ?? sessionId;
 
-  const customerEmail =
-    session.customer_details?.email ?? session.customer_email ?? "";
+  const customerEmail = session.customer_details?.email ?? session.customer_email ?? "";
 
   if (!customerEmail) {
     return NextResponse.json({ error: "No customer email on session" }, { status: 400 });
   }
 
-  // Idempotency: if already delivered for this session, do nothing
   const existing = await prisma.delivery.findUnique({ where: { sessionId } });
   if (existing) {
     return NextResponse.json({ delivered: true });
   }
 
-  // Determine what was purchased (assumes 1 item checkout)
-  const lineItems = await stripe.checkout.sessions.listLineItems(sessionId, { limit: 10 });
+  const lineItems = await stripe.checkout.sessions.listLineItems(sessionId, { limit: 2 });
+  const firstItem = lineItems.data[0];
 
-  const priceId = lineItems.data[0]?.price?.id;
-  if (!priceId) {
+  if (!firstItem?.price?.id) {
     return NextResponse.json({ error: "No priceId found" }, { status: 400 });
   }
 
-  // Fetch the Stripe Price and expand its Product so we can read Product metadata.sku
-  const price = await stripe.prices.retrieve(priceId, { expand: ["product"] });
+  if (lineItems.data.length > 1 || (firstItem.quantity ?? 1) !== 1) {
+    return NextResponse.json(
+      { error: "Only one unit per checkout session is supported" },
+      { status: 400 }
+    );
+  }
+
+  const price = await stripe.prices.retrieve(firstItem.price.id, { expand: ["product"] });
 
   const stripeProduct = price.product;
   if (!stripeProduct || typeof stripeProduct === "string") {
@@ -84,15 +89,15 @@ export async function POST(req: Request) {
   }
 
   const productName = stripeProduct.name?.trim() || sku;
+  const instructions = stripeProduct.metadata?.instructions?.trim() || "";
 
-  // Ensure product exists in our DB
   const product = await prisma.product.upsert({
     where: { sku },
     update: { name: productName },
     create: { sku, name: productName },
   });
 
-  let deliveredKey = "";
+  let deliveredSecret = "";
   let outOfStock = false;
   let fulfillmentFailed = false;
 
@@ -106,24 +111,25 @@ export async function POST(req: Request) {
       if (!item) throw new Error("OUT_OF_STOCK");
 
       const now = new Date();
-
       const claimed = await tx.stockItem.update({
         where: { id: item.id },
         data: { claimedAt: now, orderId, sessionId },
       });
 
+      const revealed = revealStockSecret(claimed.key);
+
       return tx.delivery.create({
         data: {
-            productId: product.id,
+          productId: product.id,
           orderId,
           sessionId,
           customerEmail,
-          deliveredKey: claimed.key,
+          deliveredKey: revealed,
         },
       });
     });
 
-    deliveredKey = delivery.deliveredKey;
+    deliveredSecret = delivery.deliveredKey;
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : String(e);
     if (message === "OUT_OF_STOCK") outOfStock = true;
@@ -137,7 +143,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Fulfillment failed" }, { status: 500 });
   }
 
-  // Email the key (optional but recommended)
   const resendKey = process.env.RESEND_API_KEY;
   const from = process.env.FULFILL_FROM_EMAIL || process.env.RESEND_FROM_EMAIL;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
@@ -145,9 +150,16 @@ export async function POST(req: Request) {
   if (resendKey && from && siteUrl) {
     const resend = new Resend(resendKey);
 
+    const deliveryToken = createDeliveryToken(sessionId, customerEmail);
     const successUrl = `${siteUrl.replace(/\/+$/, "")}/checkout/success?session_id=${encodeURIComponent(
       sessionId
-    )}`;
+    )}&t=${encodeURIComponent(deliveryToken)}`;
+
+    const instructionsBlock = instructions
+      ? `<p><strong>How to use it:</strong></p><pre style="padding:12px;background:#1f1f1f;color:#fff;border-radius:8px;white-space:pre-wrap;">${escapeHtml(
+          instructions
+        )}</pre>`
+      : "";
 
     await resend.emails.send({
       from,
@@ -156,11 +168,12 @@ export async function POST(req: Request) {
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.5;">
           <h2>Thanks for your purchase</h2>
-          <p><strong>Your key:</strong></p>
-          <pre style="padding:12px;background:#111;color:#0f0;border-radius:8px;">${escapeHtml(
-            deliveredKey
+          <p><strong>Your key / account info:</strong></p>
+          <pre style="padding:12px;background:#111;color:#0f0;border-radius:8px;white-space:pre-wrap;">${escapeHtml(
+            deliveredSecret
           )}</pre>
-          <p>You can also view it here: <a href="${successUrl}">${successUrl}</a></p>
+          ${instructionsBlock}
+          <p>Open your secure delivery page here: <a href="${successUrl}">${successUrl}</a></p>
         </div>
       `,
     });
