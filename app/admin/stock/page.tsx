@@ -16,16 +16,14 @@ export default function AdminStockPage() {
         />
         <textarea
           name="keys"
-          placeholder="Paste keys (one per line)"
+          placeholder="Paste keys or account info (one per line)"
           className="rounded-xl bg-white/5 border border-white/10 p-3 min-h-[200px]"
         />
-        <button className="rounded-xl bg-white text-black font-semibold p-3">
-          Add Stock
-        </button>
+        <button className="rounded-xl bg-white text-black font-semibold p-3">Add Stock</button>
       </form>
 
       <p className="text-white/60 text-sm">
-        Tip: Don’t share this link publicly. Add auth later if you want.
+        Tip: Keep this page private and set STOCK_ENCRYPTION_KEY for encrypted-at-rest stock.
       </p>
     </div>
   );

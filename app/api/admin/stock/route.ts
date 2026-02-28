@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
+import { protectStockSecret } from "@/lib/stock-secrets";
 const prisma = getPrisma();
 
 export const runtime = "nodejs";
@@ -31,7 +32,10 @@ export async function POST(req: Request) {
   });
 
   await prisma.stockItem.createMany({
-    data: keys.map((k) => ({ productId: product.id, key: k })),
+    data: keys.map((rawSecret) => ({
+      productId: product.id,
+      key: protectStockSecret(rawSecret),
+    })),
   });
 
   return NextResponse.redirect(new URL("/admin/stock", req.url));
