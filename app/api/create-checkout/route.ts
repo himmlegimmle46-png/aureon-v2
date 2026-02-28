@@ -46,7 +46,7 @@ export async function POST(req: Request) {
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Checkout error";
 
-    console.error("[checkout][server_error]", {
+    console.error("[create-checkout][server_error]", {
       ts,
       host,
       message,

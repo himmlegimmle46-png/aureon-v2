@@ -31,7 +31,7 @@ export default function RustAccountsPage() {
     setLoadingKey(key);
 
     try {
-      const res = await fetch("/api/checkout", {
+      const res = await fetch("/api/create-checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ priceId }),
