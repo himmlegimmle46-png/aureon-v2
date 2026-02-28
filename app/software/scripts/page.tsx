@@ -14,9 +14,9 @@ type Variant = {
 };
 
 const TOOL_KEY_VARIANTS: Variant[] = [
-  { id: "Serenity Cheat 1", label: "Evade Scripts 30 days", priceLabel: "$25.00", priceId: "price_1T3vdNISP3QHCCrMxL6U5ByH", inStock: true },
-  { id: "Serenity Cheat 7", label: "Evade Scripts 90 days", priceLabel: "$50.00", priceId: "price_1T3vdnISP3QHCCrMWQMTjRk0", inStock: true },
-  { id: "Serenity Cheat 30", label: "Evade Scripts lifetime", priceLabel: "$100.00", priceId: "price_1T3veCISP3QHCCrM9Dj1oxM3", inStock: true },
+  { id: "evade-30", label: "Evade Scripts 30 days", priceLabel: "$25.00", priceId: "price_1T3vdNISP3QHCCrMxL6U5ByH", inStock: true },
+  { id: "evade-90", label: "Evade Scripts 90 days", priceLabel: "$50.00", priceId: "price_1T3vdnISP3QHCCrMWQMTjRk0", inStock: true },
+  { id: "evade-lifetime", label: "Evade Scripts lifetime", priceLabel: "$100.00", priceId: "price_1T3veCISP3QHCCrM9Dj1oxM3", inStock: true },
 ];
 
 type CheckoutResponse = { url?: string; error?: string; codes?: string[]; host?: string; ts?: string };

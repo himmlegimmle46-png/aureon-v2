@@ -14,9 +14,9 @@ type Variant = {
 };
 
 const TOOL_KEY_VARIANTS: Variant[] = [
-  { id: "Serenity Cheat 1", label: "Serenity Cheat 1 day", priceLabel: "$4.00", priceId: "price_1T3vrzISP3QHCCrMvWLlPKkC", inStock: true },
-  { id: "Serenity Cheat 7", label: "Serenity Cheat 7 days", priceLabel: "$20.00", priceId: "price_1T3vsAISP3QHCCrMTE9MiEht", inStock: true },
-  { id: "Serenity Cheat 30", label: "Serenity Cheat 30 days", priceLabel: "$40.00", priceId: "price_1T3vsOISP3QHCCrMC4MLqFWv", inStock: true },
+  { id: "arc-serenity-1", label: "Serenity Cheat 1 day", priceLabel: "$4.00", priceId: "price_1T3vrzISP3QHCCrMvWLlPKkC", inStock: true },
+  { id: "arc-serenity-7", label: "Serenity Cheat 7 days", priceLabel: "$20.00", priceId: "price_1T3vsAISP3QHCCrMTE9MiEht", inStock: true },
+  { id: "arc-serenity-30", label: "Serenity Cheat 30 days", priceLabel: "$40.00", priceId: "price_1T3vsOISP3QHCCrMC4MLqFWv", inStock: true },
 ];
 
 type CheckoutResponse = { url?: string; error?: string; codes?: string[]; host?: string; ts?: string };

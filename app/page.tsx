@@ -1,132 +1,107 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Card } from "../components/ui";
+import { useRouter } from "next/navigation";
 
-const FEATURES = [
-  "Manual verification before checkout",
-  "Stripe-powered secure payments",
-  "Fast post-checkout delivery instructions",
-];
-
-const STEPS = [
-  {
-    title: "Pick your product",
-    desc: "Browse software or account listings and choose the exact plan you want.",
-  },
-  {
-    title: "Verify and pay",
-    desc: "Complete verification, then finish payment securely through Stripe.",
-  },
-  {
-    title: "Get your delivery",
-    desc: "After checkout, delivery instructions and next steps are shown immediately.",
-  },
-];
-
-const SUPPORT = [
-  {
-    title: "Transparent checkout flow",
-    desc: "No hidden steps—verify first, purchase second, delivery after.",
-  },
-  {
-    title: "Built for speed",
-    desc: "Lightweight pages and calmer visuals for smoother browsing.",
-  },
-  {
-    title: "Direct support",
-    desc: "If anything goes wrong, reach out and include what you clicked.",
-  },
+const STATS = [
+  { n: "1", t: "Products sold" },
+  { n: "1", t: "Total customers" },
+  { n: "1", t: "Reviews received" },
+  { n: "5.00", t: "Average rating" },
 ];
 
 export default function HomePage() {
+  const router = useRouter();
+  const [q, setQ] = useState("");
+
+  const stats = useMemo(() => STATS, []);
+
+  function goSearch() {
+    const query = q.trim();
+    if (!query) return router.push("/products");
+    router.push(`/products?search=${encodeURIComponent(query)}`);
+  }
+
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-8">
-      <style>{`
-        @keyframes heroFloat {
-          0% { transform: translate3d(-10px, 0px, 0) scale(1); }
-          100% { transform: translate3d(10px, -8px, 0) scale(1.04); }
-        }
+    <div className="relative min-h-[calc(100vh-4rem)]">
+      {/* Uses your global aurora background behind this */}
+      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/20 shadow-[0_30px_120px_rgba(0,0,0,0.65)]">
+        {/* aurora-ish accent glows */}
+        <div className="pointer-events-none absolute -left-40 top-[-160px] h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,rgba(90,240,255,0.18),transparent_62%)] blur-3xl" />
+        <div className="pointer-events-none absolute -right-40 top-[-120px] h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,rgba(170,120,255,0.16),transparent_62%)] blur-3xl" />
 
-        @keyframes heroShimmer {
-          0% { background-position: 0% 50%; }
-          100% { background-position: 100% 50%; }
-        }
+        {/* content */}
+        <div className="relative px-6 pb-10 pt-12 sm:px-10 sm:pb-12 sm:pt-16">
+          <div className="mx-auto max-w-3xl text-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-white/70">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-300/90 shadow-[0_0_0_7px_rgba(90,255,160,0.10)]" />
+              Aureon
+            </div>
 
-        .home-hero-glow {
-          animation: heroFloat 7s ease-in-out infinite alternate;
-        }
+            <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white/95 sm:text-6xl">
+              Welcome to <span className="ac-text-accent">Aureon</span>
+            </h1>
 
-        .home-hero-title {
-          background: linear-gradient(90deg, #d8eeff, #bdb8ff, #88d8ff, #d8eeff);
-          background-size: 220% 220%;
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-          animation: heroShimmer 8s linear infinite;
-        }
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-white/65 sm:text-base">
+              Browse products, checkout with Stripe, and receive delivery steps right after payment.
+            </p>
 
-        @media (prefers-reduced-motion: reduce) {
-          .home-hero-glow,
-          .home-hero-title {
-            animation: none !important;
-          }
-        }
-      `}</style>
+            {/* search (actually routes) */}
+            <div className="mx-auto mt-8 flex max-w-2xl items-center gap-3 rounded-2xl border border-white/10 bg-black/35 px-4 py-3 shadow-[0_14px_60px_rgba(0,0,0,0.55)]">
+              <span className="text-white/55">⌕</span>
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") goSearch();
+                }}
+                placeholder="Search for products..."
+                className="w-full bg-transparent text-sm text-white/85 placeholder:text-white/35 outline-none"
+              />
+              <button
+                type="button"
+                onClick={goSearch}
+                className="shrink-0 rounded-xl border border-white/10 bg-white/[0.06] px-3 py-2 text-xs font-semibold text-white/85 transition hover:bg-white/[0.10]"
+              >
+                Go
+              </button>
+            </div>
 
-      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-[#0b1324] via-[#0a1120] to-[#090d17] p-8 sm:p-12">
-        <div className="home-hero-glow pointer-events-none absolute -top-20 left-1/2 h-[400px] w-[400px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(86,141,255,0.28),transparent_64%)] blur-3xl" />
-        <div className="home-hero-glow pointer-events-none absolute -bottom-20 right-0 h-[320px] w-[320px] rounded-full bg-[radial-gradient(circle,rgba(151,102,255,0.25),transparent_66%)] blur-3xl" />
-
-        <div className="relative max-w-3xl space-y-5">
-          <p className="text-xs uppercase tracking-[0.18em] text-cyan-200/80">Aureon</p>
-          <h1 className="home-hero-title text-4xl font-semibold tracking-tight sm:text-5xl">
-            Better storefront. Smoother checkout. Cleaner delivery flow.
-          </h1>
-          <p className="text-sm text-white/75 sm:text-base">
-            Aureon is built for simple purchasing: choose your product, verify, pay through Stripe, and instantly view
-            your delivery instructions.
-          </p>
-
-          <div className="flex flex-wrap gap-3 pt-2">
-            <Link
-              href="/products"
-              className="rounded-xl border border-cyan-300/30 bg-cyan-300/15 px-5 py-2.5 text-sm font-medium text-cyan-100 transition hover:bg-cyan-300/20"
-            >
-              Browse products
-            </Link>
-            <Link
-              href="/contact"
-              className="rounded-xl border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-medium text-white/90 transition hover:bg-white/10"
-            >
-              Contact support
-            </Link>
+            {/* CTA */}
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Link
+                href="/products"
+                className="inline-flex items-center gap-2 rounded-xl bg-white/[0.08] px-6 py-3 text-sm font-semibold text-white/95 shadow-[0_18px_70px_rgba(0,0,0,0.6)] transition hover:bg-white/[0.11] active:translate-y-[1px]"
+              >
+                View Products <span className="opacity-80">→</span>
+              </Link>
+              <Link
+                href="/contact"
+                className="inline-flex items-center rounded-xl border border-white/12 bg-white/[0.035] px-6 py-3 text-sm font-medium text-white/80 transition hover:bg-white/[0.06] active:translate-y-[1px]"
+              >
+                Contact Support
+              </Link>
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-2 pt-3">
-            {FEATURES.map((f) => (
-              <span key={f} className="rounded-full border border-white/15 bg-black/25 px-3 py-1 text-xs text-white/70">
-                {f}
-              </span>
+          {/* stats */}
+          <div className="mt-12 grid gap-6 border-t border-white/10 pt-8 sm:grid-cols-4">
+            {stats.map((s) => (
+              <div key={s.t} className="text-center">
+                <div className="text-4xl font-semibold tracking-tight text-white/85">
+                  {s.n}
+                </div>
+                <div className="mt-2 text-xs uppercase tracking-[0.18em] text-white/45">
+                  {s.t}
+                </div>
+              </div>
             ))}
           </div>
         </div>
-      </section>
 
-      <section className="grid gap-3 sm:grid-cols-3">
-        {STEPS.map((s) => (
-          <Card key={s.title} className="p-5">
-            <h2 className="text-base font-semibold">{s.title}</h2>
-            <p className="pt-2 text-sm text-white/70">{s.desc}</p>
-          </Card>
-        ))}
-      </section>
-
-      <section className="grid gap-3 sm:grid-cols-3">
-        {SUPPORT.map((x) => (
-          <Card key={x.title} className="p-5">
-            <h3 className="text-sm font-semibold text-white/95">{x.title}</h3>
-            <p className="pt-2 text-sm text-white/65">{x.desc}</p>
-          </Card>
-        ))}
+        {/* bottom fade */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
       </section>
     </div>
   );

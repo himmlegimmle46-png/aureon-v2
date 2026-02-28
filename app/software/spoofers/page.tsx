@@ -14,9 +14,9 @@ type Variant = {
 };
 
 const TOOL_KEY_VARIANTS: Variant[] = [
-  { id: "Serenity Cheat 1", label: "Exception Spoofer 1 day", priceLabel: "$5.00", priceId: "price_1T3vegISP3QHCCrM51PKxVzz", inStock: true },
-  { id: "Serenity Cheat 7", label: "Exception Spoofer 7 days", priceLabel: "$12.00", priceId: "price_1T3vezISP3QHCCrMI6dMjXDn", inStock: true },
-  { id: "Serenity Cheat 30", label: "Exception Spoofer 30 days", priceLabel: "$22.00", priceId: "price_1T3vfLISP3QHCCrMju6wy42g", inStock: true },
+  { id: "exception-1", label: "Exception Spoofer 1 day", priceLabel: "$5.00", priceId: "price_1T3vegISP3QHCCrM51PKxVzz", inStock: true },
+  { id: "exception-7", label: "Exception Spoofer 7 days", priceLabel: "$12.00", priceId: "price_1T3vezISP3QHCCrMI6dMjXDn", inStock: true },
+  { id: "exception-30", label: "Exception Spoofer 30 days", priceLabel: "$22.00", priceId: "price_1T3vfLISP3QHCCrMju6wy42g", inStock: true },
 ];
 
 type CheckoutResponse = { url?: string; error?: string; codes?: string[]; host?: string; ts?: string };
